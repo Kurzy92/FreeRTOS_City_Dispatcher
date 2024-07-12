@@ -31,6 +31,15 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "dispatcher.h"
+#include "stdbool.h"
+#include "stdio.h"
+#include "cmsis_os.h"
+#include "FreeRTOS.h"
+#include "FreeRTOSConfig.h"
+#include "queue.h"
+#include "semphr.h"
+
 
 /* USER CODE END Includes */
 
@@ -41,6 +50,20 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
+extern QueueHandle_t qDispatcher;
+extern QueueHandle_t qAmbulance;
+extern QueueHandle_t qPolice;
+extern QueueHandle_t qFire;
+extern QueueHandle_t qCorona;
+extern QueueHandle_t qLogger;
+
+extern RNG_HandleTypeDef hrng;
+
+extern DispatcherPacket dispPack;
+
+extern SemaphoreHandle_t xTasksDataMutex;
+extern SemaphoreHandle_t xPrintfMutex;
+extern uint32_t total_tasks_ran;
 
 /* USER CODE END EC */
 

@@ -1,0 +1,3 @@
+../Core/Src/dispatcher.c:44:6:initDispatcher	4	static
+../Core/Src/dispatcher.c:48:6:vDispatcherCode	128	static,ignoring_inline_asm
+../Core/Src/dispatcher.c:96:6:generateDispatcherMSG	24	static

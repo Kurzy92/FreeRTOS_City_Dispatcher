@@ -18,19 +18,11 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "cmsis_os.h"
+
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "stdbool.h"
-#include "stdio.h"
-#include "string.h"
-#include "task.h"
-#include "queue.h"
-#include "timers.h"
-#include "defs.h"
-#include "semphr.h"
-#include "time.h"
+
 
 /* USER CODE END Includes */
 
@@ -41,7 +33,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-bool TIM_int;
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -60,14 +52,8 @@ UART_HandleTypeDef huart3;
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
 /* Definitions for defaultTask */
-osThreadId_t defaultTaskHandle;
-const osThreadAttr_t defaultTask_attributes = {
-  .name = "defaultTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
-};
-/* USER CODE BEGIN PV */
 
+/* USER CODE BEGIN PV */
 
 // QUEUE Handles
 QueueHandle_t qAmbulance;
@@ -90,9 +76,12 @@ float total_tasks_time;
 uint32_t total_tasks_ran;
 float average_task_time;
 SemaphoreHandle_t xTasksDataMutex;
+SemaphoreHandle_t xPrintfMutex;
 
 
-const DispatcherPacket dispPack = {
+
+
+DispatcherPacket dispPack = {
 		POLICE,
 		"help!"
 };
@@ -110,7 +99,6 @@ void StartDefaultTask(void *argument);
 
 /* USER CODE BEGIN PFP */
 void vHandleCall(void* pvParameters);
-void vDispatcherCode(void *pvParameters);
 void initQueues(void);
 void initTasks(void);
 //void initTasks(void);
@@ -127,9 +115,7 @@ void initTasks(void);
   */
 int main(void)
 {
-
   /* USER CODE BEGIN 1 */
-	TIM_int = false;
 	total_tasks_time = 0;
   /* USER CODE END 1 */
 
@@ -194,6 +180,7 @@ int main(void)
 		  &vInitTaskHandle);
 
   xTasksDataMutex = xSemaphoreCreateMutex();
+  xPrintfMutex = xSemaphoreCreateMutex();
   /* add threads, ... */
 
   /* USER CODE END RTOS_THREADS */
@@ -311,9 +298,9 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 15;
+  htim2.Init.Prescaler = 8399;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 44999;
+  htim2.Init.Period = 49;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -640,29 +627,7 @@ void initQueues(void) {
 
 }
 
-void vDispatcherCode(void *pvParameters) {
-	configASSERT(((uint32_t) pvParameters) == 1);
-	uint32_t ulNotificationValue;
 
-	for(;;) {
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, GPIO_PIN_SET);
-		printf("Dispatcher Entered BLOCKED state! \r\n");
-		fflush(stdout);
-		xTaskNotifyWait(0x00, 0x00, &ulNotificationValue, portMAX_DELAY);
-		printf("Dispatcher in RUNNING state! \n \tPerforming a task! \r\n");
-		fflush(stdout);
-		DispatcherPacket new_packet;
-		if( xQueueReceive(qDispatcher, &new_packet, portMAX_DELAY) == pdPASS) {
-			//vTaskDelay(pdMS_TO_TICKS(500));
-			//vTaskDelay(400);
-			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, GPIO_PIN_RESET);
-			printf("Dispatcher routing received packet! \r\n");
-			fflush(stdout);
-		}
-		//vTaskDelay(400);
-
-	}
-}
 
 void vHandleCall(void* pvParameters) {
 	configASSERT(((uint32_t) pvParameters) == 1);
@@ -714,24 +679,6 @@ void HAL_RNG_ReadyDataCallback(RNG_HandleTypeDef *hrng, uint32_t random32bit)
 }
 /* USER CODE END 4 */
 
-/* USER CODE BEGIN Header_StartDefaultTask */
-/**
-  * @brief  Function implementing the defaultTask thread.
-  * @param  argument: Not used
-  * @retval None
-  */
-/* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void *argument)
-{
-  /* USER CODE BEGIN 5 */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END 5 */
-}
-
 /**
   * @brief  Period elapsed callback in non blocking mode
   * @note   This function is called  when TIM6 interrupt took place, inside
@@ -744,14 +691,16 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   /* USER CODE BEGIN Callback 0 */
 	if(htim->Instance == TIM2) {
+		DispatcherPacket new_packet;
+		generateDispatcherMSG(&new_packet);
 		BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 		UBaseType_t qItems = uxQueueMessagesWaitingFromISR( qDispatcher );
 		UBaseType_t uxHighWaterMark = uxTaskGetStackHighWaterMark(vDispatcherTask);
 		if( qItems != TASKS_QUEUE_SIZE) {
-			xQueueSendFromISR(qDispatcher, &dispPack, NULL);
+			xQueueSendFromISR(qDispatcher, &new_packet, NULL);
 			xTaskNotifyFromISR(vDispatcherTask, 0x00, eNoAction, &xHigherPriorityTaskWoken);
-			printf("Added to queue! \r\n");
-			fflush(stdout);
+			//printf("Added to queue! \r\n");
+			//fflush(stdout);
 		} else {
 			xTaskNotifyFromISR(vDispatcherTask, 0x00, eNoAction, &xHigherPriorityTaskWoken);
 		}

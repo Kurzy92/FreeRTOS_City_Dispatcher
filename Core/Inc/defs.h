@@ -8,6 +8,8 @@
 #ifndef INC_DEFS_H_
 #define INC_DEFS_H_
 
+#include "stdint.h"
+
 #define AMBULANCE_TASKS 4
 #define POLICE_TASKS 3
 #define FIRE_TASKS 2
@@ -24,6 +26,7 @@
 #define FLAG_CORONA		(1 << 3) // 0x08
 
 #define MAX_NAME_LEN 12
+#define MAX_MSG_LENGTH	100
 
 #define MIN_TIM2_IT_PERIOD	100 	// in milliseconds
 #define MAX_TIM2_IT_PERIOD	500 // in milliseconds
@@ -44,7 +47,8 @@ typedef struct _Department {
 
 typedef struct _DispatcherPacket {
 	enum DepartmentsEnum department;
-	char* message;
+	char message[MAX_MSG_LENGTH];
+	uint16_t timeToHandleInTicks;
 } DispatcherPacket;
 
 

@@ -1,0 +1,6 @@
+Missions TODO:
+	- Create a mechanism to identify running/blocked tasks.
+	- Create a function that is responsible for waking up a BLOCKED task in order for 
+	  it to handle a task from its relevant queue.
+	- Figure out what resources requires protection.
+	- Implement the code for counting the amounts of tasks done, total time, average time.
