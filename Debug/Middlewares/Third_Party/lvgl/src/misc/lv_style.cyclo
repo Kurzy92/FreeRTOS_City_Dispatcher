@@ -1,0 +1,15 @@
+../Middlewares/Third_Party/lvgl/src/misc/../font/../draw/../stdlib/lv_string.h:65:20:lv_memzero	1
+../Middlewares/Third_Party/lvgl/src/misc/lv_style.h:406:20:lv_style_is_const	2
+../Middlewares/Third_Party/lvgl/src/misc/lv_style.h:494:30:lv_style_get_prop_inlined	6
+../Middlewares/Third_Party/lvgl/src/misc/lv_style.h:534:24:_lv_style_get_prop_group	2
+../Middlewares/Third_Party/lvgl/src/misc/lv_style.c:175:6:lv_style_init	1
+../Middlewares/Third_Party/lvgl/src/misc/lv_style.c:189:6:lv_style_reset	2
+../Middlewares/Third_Party/lvgl/src/misc/lv_style.c:200:17:lv_style_register_prop	6
+../Middlewares/Third_Party/lvgl/src/misc/lv_style.c:236:17:lv_style_get_num_custom_props	1
+../Middlewares/Third_Party/lvgl/src/misc/lv_style.c:241:6:lv_style_remove_prop	8
+../Middlewares/Third_Party/lvgl/src/misc/lv_style.c:286:6:lv_style_set_prop	8
+../Middlewares/Third_Party/lvgl/src/misc/lv_style.c:335:16:lv_style_get_prop	1
+../Middlewares/Third_Party/lvgl/src/misc/lv_style.c:340:6:lv_style_transition_dsc_init	2
+../Middlewares/Third_Party/lvgl/src/misc/lv_style.c:351:18:lv_style_prop_get_default	20
+../Middlewares/Third_Party/lvgl/src/misc/lv_style.c:415:6:lv_style_is_empty	1
+../Middlewares/Third_Party/lvgl/src/misc/lv_style.c:422:9:_lv_style_prop_lookup_flags	6

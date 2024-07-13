@@ -1,0 +1,13 @@
+../Middlewares/Third_Party/lvgl/src/draw/../misc/../font/../draw/../misc/lv_area.h:126:20:lv_area_copy	16	static
+../Middlewares/Third_Party/lvgl/src/draw/../misc/../font/../draw/../misc/lv_area.h:139:23:lv_area_get_width	16	static
+../Middlewares/Third_Party/lvgl/src/draw/../misc/../font/../draw/../misc/lv_area.h:149:23:lv_area_get_height	16	static
+../Middlewares/Third_Party/lvgl/src/draw/../misc/../font/../draw/../misc/lv_color.h:286:26:lv_color_make	24	static
+../Middlewares/Third_Party/lvgl/src/draw/../misc/../font/../draw/../misc/lv_color.h:422:26:lv_color_black	16	static
+../Middlewares/Third_Party/lvgl/src/draw/../misc/../font/../draw/../stdlib/lv_string.h:65:20:lv_memzero	16	static
+../Middlewares/Third_Party/lvgl/src/draw/lv_draw_image.c:46:6:lv_draw_image_dsc_init	24	static
+../Middlewares/Third_Party/lvgl/src/draw/lv_draw_image.c:57:6:lv_draw_layer	64	static
+../Middlewares/Third_Party/lvgl/src/draw/lv_draw_image.c:76:6:lv_draw_image	72	static
+../Middlewares/Third_Party/lvgl/src/draw/lv_draw_image.c:107:16:lv_image_src_get_type	24	static
+../Middlewares/Third_Party/lvgl/src/draw/lv_draw_image.c:124:6:_lv_draw_image_normal_helper	152	static
+../Middlewares/Third_Party/lvgl/src/draw/lv_draw_image.c:164:6:_lv_draw_image_tiled_helper	176	static
+../Middlewares/Third_Party/lvgl/src/draw/lv_draw_image.c:221:13:img_decode_and_draw	120	static

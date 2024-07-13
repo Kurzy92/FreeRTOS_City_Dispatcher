@@ -1,0 +1,8 @@
+../Middlewares/Third_Party/lvgl/examples/widgets/image/../../../src/core/../misc/../font/../draw/../misc/lv_color.h:286:26:lv_color_make	24	static
+../Middlewares/Third_Party/lvgl/examples/widgets/image/../../../src/core/../display/lv_display.h:392:26:lv_screen_active	8	static
+../Middlewares/Third_Party/lvgl/examples/widgets/image/../../../src/widgets/slider/lv_slider.h:77:20:lv_slider_set_value	24	static
+../Middlewares/Third_Party/lvgl/examples/widgets/image/../../../src/widgets/slider/lv_slider.h:99:20:lv_slider_set_range	24	static
+../Middlewares/Third_Party/lvgl/examples/widgets/image/../../../src/widgets/slider/lv_slider.h:123:23:lv_slider_get_value	16	static
+../Middlewares/Third_Party/lvgl/examples/widgets/image/lv_example_image_2.c:13:6:lv_example_image_2	32	static
+../Middlewares/Third_Party/lvgl/examples/widgets/image/lv_example_image_2.c:40:13:slider_event_cb	32	static
+../Middlewares/Third_Party/lvgl/examples/widgets/image/lv_example_image_2.c:52:19:create_slider	24	static

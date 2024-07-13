@@ -1,0 +1,4 @@
+../Middlewares/Third_Party/lvgl/examples/widgets/button/../../../src/core/../display/lv_display.h:392:26:lv_screen_active	1
+../Middlewares/Third_Party/lvgl/examples/widgets/button/../../../src/core/lv_obj_pos.h:184:20:lv_obj_center	1
+../Middlewares/Third_Party/lvgl/examples/widgets/button/lv_example_button_1.c:4:13:event_handler	1
+../Middlewares/Third_Party/lvgl/examples/widgets/button/lv_example_button_1.c:16:6:lv_example_button_1	1

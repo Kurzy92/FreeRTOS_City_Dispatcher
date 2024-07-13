@@ -1,0 +1,5 @@
+../Middlewares/Third_Party/lvgl/examples/scroll/../../src/core/../misc/../font/../draw/../misc/lv_area.h:352:23:lv_pct	16	static
+../Middlewares/Third_Party/lvgl/examples/scroll/../../src/core/../display/lv_display.h:392:26:lv_screen_active	8	static
+../Middlewares/Third_Party/lvgl/examples/scroll/../../src/core/lv_obj_pos.h:184:20:lv_obj_center	16	static
+../Middlewares/Third_Party/lvgl/examples/scroll/lv_example_scroll_2.c:4:13:sw_event_cb	32	static
+../Middlewares/Third_Party/lvgl/examples/scroll/lv_example_scroll_2.c:20:6:lv_example_scroll_2	40	static

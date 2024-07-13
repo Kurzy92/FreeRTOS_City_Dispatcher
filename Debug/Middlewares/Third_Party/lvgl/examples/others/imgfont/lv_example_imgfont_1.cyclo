@@ -1,0 +1,3 @@
+../Middlewares/Third_Party/lvgl/examples/others/imgfont/../../../src/core/../display/lv_display.h:392:26:lv_screen_active	1
+../Middlewares/Third_Party/lvgl/examples/others/imgfont/../../../src/core/lv_obj_pos.h:184:20:lv_obj_center	1
+../Middlewares/Third_Party/lvgl/examples/others/imgfont/lv_example_imgfont_1.c:53:6:lv_example_imgfont_1	1

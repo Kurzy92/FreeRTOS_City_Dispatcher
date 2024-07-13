@@ -1,0 +1,7 @@
+../Middlewares/Third_Party/lvgl/examples/widgets/chart/../../../src/core/../display/lv_display.h:392:26:lv_screen_active	1
+../Middlewares/Third_Party/lvgl/examples/widgets/chart/../../../src/core/lv_obj_pos.h:184:20:lv_obj_center	1
+../Middlewares/Third_Party/lvgl/examples/widgets/chart/../../../src/core/lv_obj_style.h:241:20:lv_obj_set_style_pad_all	1
+../Middlewares/Third_Party/lvgl/examples/widgets/chart/lv_example_chart_5.c:12:6:lv_example_chart_5	2
+../Middlewares/Third_Party/lvgl/examples/widgets/chart/lv_example_chart_5.c:35:13:draw_event_cb	5
+../Middlewares/Third_Party/lvgl/examples/widgets/chart/lv_example_chart_5.c:50:13:add_faded_area	2
+../Middlewares/Third_Party/lvgl/examples/widgets/chart/lv_example_chart_5.c:103:13:hook_division_lines	6

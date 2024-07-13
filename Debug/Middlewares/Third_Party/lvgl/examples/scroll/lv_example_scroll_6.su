@@ -1,0 +1,6 @@
+../Middlewares/Third_Party/lvgl/examples/scroll/../../src/core/../misc/../font/../draw/../misc/lv_area.h:149:23:lv_area_get_height	16	static
+../Middlewares/Third_Party/lvgl/examples/scroll/../../src/core/../misc/../font/../draw/../misc/lv_area.h:352:23:lv_pct	16	static
+../Middlewares/Third_Party/lvgl/examples/scroll/../../src/core/../display/lv_display.h:392:26:lv_screen_active	8	static
+../Middlewares/Third_Party/lvgl/examples/scroll/../../src/core/lv_obj_pos.h:184:20:lv_obj_center	16	static
+../Middlewares/Third_Party/lvgl/examples/scroll/lv_example_scroll_6.c:4:13:scroll_event_cb	112	static
+../Middlewares/Third_Party/lvgl/examples/scroll/lv_example_scroll_6.c:51:6:lv_example_scroll_6	24	static

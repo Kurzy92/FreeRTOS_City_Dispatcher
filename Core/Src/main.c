@@ -18,7 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
+#include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -44,6 +44,9 @@
 /* Private variables ---------------------------------------------------------*/
 
 RNG_HandleTypeDef hrng;
+
+SPI_HandleTypeDef hspi1;
+DMA_HandleTypeDef hdma_spi1_tx;
 
 TIM_HandleTypeDef htim2;
 
@@ -71,6 +74,11 @@ TaskHandle_t vCoronaTasks[CORONA_TASKS];
 TaskHandle_t vDispatcherTask;
 TaskHandle_t vInitTaskHandle;
 
+// Display Tasks
+TaskHandle_t LvglTask;
+lv_display_t *lcd_disp;
+volatile int lcd_bus_busy = 0;
+
 // TASKS Data Objects
 float total_tasks_time;
 uint32_t total_tasks_ran;
@@ -78,6 +86,9 @@ float average_task_time;
 SemaphoreHandle_t xTasksDataMutex;
 SemaphoreHandle_t xPrintfMutex;
 
+// Display Functions
+void ui_init(lv_display_t *disp);
+void LVGL_Task(void const *argument);
 
 
 
@@ -91,11 +102,12 @@ DispatcherPacket dispPack = {
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_RNG_Init(void);
 static void MX_TIM2_Init(void);
-void StartDefaultTask(void *argument);
+static void MX_SPI1_Init(void);
 
 /* USER CODE BEGIN PFP */
 void vHandleCall(void* pvParameters);
@@ -115,6 +127,7 @@ void initTasks(void);
   */
 int main(void)
 {
+
   /* USER CODE BEGIN 1 */
 	total_tasks_time = 0;
   /* USER CODE END 1 */
@@ -137,16 +150,17 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_USART3_UART_Init();
   MX_USB_OTG_FS_PCD_Init();
   MX_RNG_Init();
   MX_TIM2_Init();
+  MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
 
   /* Init scheduler */
-  //osKernelInitialize();
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -167,17 +181,26 @@ int main(void)
 
   /* Create the thread(s) */
   /* creation of defaultTask */
-  //defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
+
   BaseType_t status;
-  //initTasks();
+
+  status = xTaskCreate((TaskFunction_t)LVGL_Task,
+		  	  	  	  "LVGL_Task",
+					  1024,
+					  (void*)1,
+					  7,
+					  &LvglTask);
+  configASSERT(status == pdTRUE);
+
   status = xTaskCreate((TaskFunction_t)initTasks,
 		  "init_task",
 		  configMINIMAL_STACK_SIZE,
 		  (void*) 1,
 		  configMAX_PRIORITIES,
 		  &vInitTaskHandle);
+  configASSERT(status == pdTRUE);
 
   xTasksDataMutex = xSemaphoreCreateMutex();
   xPrintfMutex = xSemaphoreCreateMutex();
@@ -193,7 +216,6 @@ int main(void)
   /* USER CODE END RTOS_EVENTS */
 
   /* Start scheduler */
-  //osKernelStart();
 
   /* We should never get here as control is now taken by the scheduler */
 
@@ -280,6 +302,46 @@ static void MX_RNG_Init(void)
 }
 
 /**
+  * @brief SPI1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_SPI1_Init(void)
+{
+
+  /* USER CODE BEGIN SPI1_Init 0 */
+
+  /* USER CODE END SPI1_Init 0 */
+
+  /* USER CODE BEGIN SPI1_Init 1 */
+
+  /* USER CODE END SPI1_Init 1 */
+  /* SPI1 parameter configuration*/
+  hspi1.Instance = SPI1;
+  hspi1.Init.Mode = SPI_MODE_MASTER;
+  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
+  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
+  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
+  hspi1.Init.NSS = SPI_NSS_SOFT;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
+  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
+  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi1.Init.CRCPolynomial = 7;
+  hspi1.Init.CRCLength = SPI_CRC_LENGTH_DATASIZE;
+  hspi1.Init.NSSPMode = SPI_NSS_PULSE_ENABLE;
+  if (HAL_SPI_Init(&hspi1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN SPI1_Init 2 */
+
+  /* USER CODE END SPI1_Init 2 */
+
+}
+
+/**
   * @brief TIM2 Initialization Function
   * @param None
   * @retval None
@@ -298,9 +360,9 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 8399;
+  htim2.Init.Prescaler = TIM2_PRESCALER_SET;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 49;
+  htim2.Init.Period = TIM2_PERIOD_SET;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -395,6 +457,22 @@ static void MX_USB_OTG_FS_PCD_Init(void)
 }
 
 /**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA2_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA2_Stream3_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -414,10 +492,19 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOG_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, LD1_Pin|LD3_Pin|LD2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(LCD_DCX_GPIO_Port, LCD_DCX_Pin, GPIO_PIN_SET);
+
+  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(USB_PowerSwitchOn_GPIO_Port, USB_PowerSwitchOn_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(LCD_RESET_GPIO_Port, LCD_RESET_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin : USER_Btn_Pin */
   GPIO_InitStruct.Pin = USER_Btn_Pin;
@@ -441,12 +528,26 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : LCD_CS_Pin */
+  GPIO_InitStruct.Pin = LCD_CS_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  HAL_GPIO_Init(LCD_CS_GPIO_Port, &GPIO_InitStruct);
+
   /*Configure GPIO pins : LD1_Pin LD3_Pin LD2_Pin */
   GPIO_InitStruct.Pin = LD1_Pin|LD3_Pin|LD2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : LCD_DCX_Pin */
+  GPIO_InitStruct.Pin = LCD_DCX_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  HAL_GPIO_Init(LCD_DCX_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : RMII_TXD1_Pin */
   GPIO_InitStruct.Pin = RMII_TXD1_Pin;
@@ -469,6 +570,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(USB_OverCurrent_GPIO_Port, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : LCD_RESET_Pin */
+  GPIO_InitStruct.Pin = LCD_RESET_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(LCD_RESET_GPIO_Port, &GPIO_InitStruct);
+
   /*Configure GPIO pins : RMII_TX_EN_Pin RMII_TXD0_Pin */
   GPIO_InitStruct.Pin = RMII_TX_EN_Pin|RMII_TXD0_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -482,6 +590,10 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+/**
+ * @brief Initialize the tasks and starting the TIM2 timer.
+ */
 void initTasks(void) {
 	/* TODO: consider creating a dedicated function to initialize the tasks,
 	 *       the function will receive the address of the tasks array, and its size,
@@ -595,6 +707,9 @@ void initTasks(void) {
 	}
 }
 
+/**
+ * @brief Initialize the queues.
+ */
 void initQueues(void) {
 	/* TODO: Consider setting attributed for each queue */
 
@@ -628,7 +743,10 @@ void initQueues(void) {
 }
 
 
-
+/**
+ * @brief Handle call function for tasks.
+ * @param pvParameters Pointer to the parameters passed to the task.
+ */
 void vHandleCall(void* pvParameters) {
 	configASSERT(((uint32_t) pvParameters) == 1);
 	uint32_t ulNotifictionValue;
@@ -677,7 +795,152 @@ void HAL_RNG_ReadyDataCallback(RNG_HandleTypeDef *hrng, uint32_t random32bit)
   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
 
 }
+
+/*
+ * Display related functions
+ */
+void lcd_color_transfer_ready_cb(SPI_HandleTypeDef *hspi)
+{
+        /* CS high */
+        HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_SET);
+        lcd_bus_busy = 0;
+        lv_display_flush_ready(lcd_disp);
+}
+
+/* Initialize LCD I/O bus, reset LCD */
+static int32_t lcd_io_init(void)
+{
+        /* Register SPI Tx Complete Callback */
+        HAL_SPI_RegisterCallback(&hspi1, HAL_SPI_TX_COMPLETE_CB_ID, lcd_color_transfer_ready_cb);
+
+        /* reset LCD */
+        HAL_GPIO_WritePin(LCD_RESET_GPIO_Port, LCD_RESET_Pin, GPIO_PIN_RESET);
+        HAL_Delay(100);
+        HAL_GPIO_WritePin(LCD_RESET_GPIO_Port, LCD_RESET_Pin, GPIO_PIN_SET);
+        HAL_Delay(100);
+
+        HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(LCD_DCX_GPIO_Port, LCD_DCX_Pin, GPIO_PIN_SET);
+
+        return HAL_OK;
+}
+
+/* Platform-specific implementation of the LCD send command function. In general this should use polling transfer. */
+static void lcd_send_cmd(lv_display_t *disp, const uint8_t *cmd, size_t cmd_size, const uint8_t *param, size_t param_size)
+{
+        LV_UNUSED(disp);
+        while (lcd_bus_busy);   /* wait until previous transfer is finished */
+        /* Set the SPI in 8-bit mode */
+        hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+        HAL_SPI_Init(&hspi1);
+        /* DCX low (command) */
+        HAL_GPIO_WritePin(LCD_DCX_GPIO_Port, LCD_DCX_Pin, GPIO_PIN_RESET);
+        /* CS low */
+        HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_RESET);
+        /* send command */
+        if (HAL_SPI_Transmit(&hspi1, (uint8_t*)cmd, cmd_size, BUS_SPI1_POLL_TIMEOUT) == HAL_OK) {
+                /* DCX high (data) */
+                HAL_GPIO_WritePin(LCD_DCX_GPIO_Port, LCD_DCX_Pin, GPIO_PIN_SET);
+                /* for short data blocks we use polling transfer */
+                HAL_SPI_Transmit(&hspi1, (uint8_t *)param, (uint16_t)param_size, BUS_SPI1_POLL_TIMEOUT);
+                /* CS high */
+                HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_SET);
+        }
+}
+
+/* Platform-specific implementation of the LCD send color function. For better performance this should use DMA transfer.
+ * In case of a DMA transfer a callback must be installed to notify LVGL about the end of the transfer.
+ */
+static void lcd_send_color(lv_display_t *disp, const uint8_t *cmd, size_t cmd_size, uint8_t *param, size_t param_size)
+{
+        LV_UNUSED(disp);
+        while (lcd_bus_busy);   /* wait until previous transfer is finished */
+        /* Set the SPI in 8-bit mode */
+        hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+        HAL_SPI_Init(&hspi1);
+        /* DCX low (command) */
+        HAL_GPIO_WritePin(LCD_DCX_GPIO_Port, LCD_DCX_Pin, GPIO_PIN_RESET);
+        /* CS low */
+        HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_RESET);
+        /* send command */
+        if (HAL_SPI_Transmit(&hspi1, (uint8_t*)cmd, cmd_size, BUS_SPI1_POLL_TIMEOUT) == HAL_OK) {
+                /* DCX high (data) */
+                HAL_GPIO_WritePin(LCD_DCX_GPIO_Port, LCD_DCX_Pin, GPIO_PIN_SET);
+                /* for color data use DMA transfer */
+                /* Set the SPI in 16-bit mode to match endianness */
+                hspi1.Init.DataSize = SPI_DATASIZE_16BIT;
+                HAL_SPI_Init(&hspi1);
+                lcd_bus_busy = 1;
+                HAL_SPI_Transmit_DMA(&hspi1, param, (uint16_t)param_size / 2);
+                /* NOTE: CS will be reset in the transfer ready callback */
+        }
+}
+
+void LVGL_Task(void const *argument)
+{
+        /* Initialize LVGL */
+        lv_init();
+
+        /* Initialize LCD I/O */
+        if (lcd_io_init() != 0)
+                return;
+
+        /* Create the LVGL display object and the LCD display driver */
+        lcd_disp = lv_ili9341_create(LCD_H_RES, LCD_V_RES, LV_LCD_FLAG_NONE, lcd_send_cmd, lcd_send_color);
+        lv_display_set_rotation(lcd_disp, LV_DISPLAY_ROTATION_270);
+
+        /* Allocate draw buffers on the heap. In this example we use two partial buffers of 1/10th size of the screen */
+        lv_color_t * buf1 = NULL;
+        lv_color_t * buf2 = NULL;
+
+        uint32_t buf_size = LCD_H_RES * LCD_V_RES / 10 * lv_color_format_get_size(lv_display_get_color_format(lcd_disp));
+
+        buf1 = lv_malloc(buf_size);
+        if(buf1 == NULL) {
+                LV_LOG_ERROR("display draw buffer malloc failed");
+                return;
+        }
+
+        buf2 = lv_malloc(buf_size);
+        if(buf2 == NULL) {
+                LV_LOG_ERROR("display buffer malloc failed");
+                lv_free(buf1);
+                return;
+        }
+        lv_display_set_buffers(lcd_disp, buf1, buf2, buf_size, LV_DISPLAY_RENDER_MODE_PARTIAL);
+
+        ui_init(lcd_disp);
+
+        for(;;) {
+                /* The task running lv_timer_handler should have lower priority than that running `lv_tick_inc` */
+                lv_timer_handler();
+                /* raise the task priority of LVGL and/or reduce the handler period can improve the performance */
+                vTaskDelay(10);
+        }
+}
+
+void ui_init(lv_display_t *disp)
+{
+        lv_obj_t *obj;
+
+        /* set screen background to white */
+        lv_obj_t *scr = lv_screen_active();
+        lv_obj_set_style_bg_color(scr, lv_color_white(), 0);
+        lv_obj_set_style_bg_opa(scr, LV_OPA_100, 0);
+
+        /* create label */
+        obj = lv_label_create(scr);
+        lv_obj_set_align(obj, LV_ALIGN_CENTER);
+        lv_obj_set_height(obj, LV_SIZE_CONTENT);
+        lv_obj_set_width(obj, LV_SIZE_CONTENT);
+        lv_obj_set_style_text_font(obj, &lv_font_montserrat_14, 0);
+        lv_obj_set_style_text_color(obj, lv_color_black(), 0);
+        lv_label_set_text(obj, "Hello World!");
+}
+
 /* USER CODE END 4 */
+
+
 
 /**
   * @brief  Period elapsed callback in non blocking mode

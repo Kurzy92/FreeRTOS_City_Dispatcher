@@ -1,0 +1,10 @@
+../Middlewares/Third_Party/lvgl/examples/widgets/arc/../../../src/misc/lv_anim.h:197:20:lv_anim_set_var	1
+../Middlewares/Third_Party/lvgl/examples/widgets/arc/../../../src/misc/lv_anim.h:209:20:lv_anim_set_exec_cb	1
+../Middlewares/Third_Party/lvgl/examples/widgets/arc/../../../src/misc/lv_anim.h:219:20:lv_anim_set_duration	1
+../Middlewares/Third_Party/lvgl/examples/widgets/arc/../../../src/misc/lv_anim.h:248:20:lv_anim_set_values	1
+../Middlewares/Third_Party/lvgl/examples/widgets/arc/../../../src/misc/lv_anim.h:352:20:lv_anim_set_repeat_count	1
+../Middlewares/Third_Party/lvgl/examples/widgets/arc/../../../src/misc/lv_anim.h:362:20:lv_anim_set_repeat_delay	1
+../Middlewares/Third_Party/lvgl/examples/widgets/arc/../../../src/core/../display/lv_display.h:392:26:lv_screen_active	1
+../Middlewares/Third_Party/lvgl/examples/widgets/arc/../../../src/core/lv_obj_pos.h:184:20:lv_obj_center	1
+../Middlewares/Third_Party/lvgl/examples/widgets/arc/lv_example_arc_2.c:5:13:set_angle	1
+../Middlewares/Third_Party/lvgl/examples/widgets/arc/lv_example_arc_2.c:13:6:lv_example_arc_2	1

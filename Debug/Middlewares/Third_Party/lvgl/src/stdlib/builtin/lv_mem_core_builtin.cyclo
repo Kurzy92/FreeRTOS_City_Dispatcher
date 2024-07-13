@@ -1,0 +1,12 @@
+../Middlewares/Third_Party/lvgl/src/stdlib/builtin/../../misc/lv_ll.h:85:20:_lv_ll_clear	1
+../Middlewares/Third_Party/lvgl/src/stdlib/builtin/../lv_string.h:65:20:lv_memzero	1
+../Middlewares/Third_Party/lvgl/src/stdlib/builtin/lv_mem_core_builtin.c:71:6:lv_mem_init	2
+../Middlewares/Third_Party/lvgl/src/stdlib/builtin/lv_mem_core_builtin.c:101:6:lv_mem_deinit	1
+../Middlewares/Third_Party/lvgl/src/stdlib/builtin/lv_mem_core_builtin.c:110:15:lv_mem_add_pool	3
+../Middlewares/Third_Party/lvgl/src/stdlib/builtin/lv_mem_core_builtin.c:125:6:lv_mem_remove_pool	3
+../Middlewares/Third_Party/lvgl/src/stdlib/builtin/lv_mem_core_builtin.c:139:8:lv_malloc_core	1
+../Middlewares/Third_Party/lvgl/src/stdlib/builtin/lv_mem_core_builtin.c:154:8:lv_realloc_core	1
+../Middlewares/Third_Party/lvgl/src/stdlib/builtin/lv_mem_core_builtin.c:169:6:lv_free_core	2
+../Middlewares/Third_Party/lvgl/src/stdlib/builtin/lv_mem_core_builtin.c:187:6:lv_mem_monitor_core	3
+../Middlewares/Third_Party/lvgl/src/stdlib/builtin/lv_mem_core_builtin.c:212:13:lv_mem_test_core	4
+../Middlewares/Third_Party/lvgl/src/stdlib/builtin/lv_mem_core_builtin.c:247:13:lv_mem_walker	3

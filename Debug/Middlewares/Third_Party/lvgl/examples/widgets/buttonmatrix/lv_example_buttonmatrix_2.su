@@ -1,0 +1,7 @@
+../Middlewares/Third_Party/lvgl/examples/widgets/buttonmatrix/../../../src/core/../misc/../font/../draw/../misc/lv_color.h:286:26:lv_color_make	24	static
+../Middlewares/Third_Party/lvgl/examples/widgets/buttonmatrix/../../../src/core/../misc/../font/../draw/../misc/lv_color.h:413:26:lv_color_white	16	static
+../Middlewares/Third_Party/lvgl/examples/widgets/buttonmatrix/../../../src/core/../misc/../font/../draw/../misc/lv_color.h:422:26:lv_color_black	16	static
+../Middlewares/Third_Party/lvgl/examples/widgets/buttonmatrix/../../../src/core/../display/lv_display.h:392:26:lv_screen_active	8	static
+../Middlewares/Third_Party/lvgl/examples/widgets/buttonmatrix/../../../src/core/lv_obj_pos.h:184:20:lv_obj_center	16	static
+../Middlewares/Third_Party/lvgl/examples/widgets/buttonmatrix/lv_example_buttonmatrix_2.c:4:13:event_cb	184	static
+../Middlewares/Third_Party/lvgl/examples/widgets/buttonmatrix/lv_example_buttonmatrix_2.c:76:6:lv_example_buttonmatrix_2	16	static

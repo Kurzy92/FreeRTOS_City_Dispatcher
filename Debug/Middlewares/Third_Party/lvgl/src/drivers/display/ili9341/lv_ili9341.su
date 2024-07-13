@@ -1,0 +1,5 @@
+../Middlewares/Third_Party/lvgl/src/drivers/display/ili9341/lv_ili9341.c:85:16:lv_ili9341_create	40	static
+../Middlewares/Third_Party/lvgl/src/drivers/display/ili9341/lv_ili9341.c:93:6:lv_ili9341_set_gap	16	static
+../Middlewares/Third_Party/lvgl/src/drivers/display/ili9341/lv_ili9341.c:98:6:lv_ili9341_set_invert	16	static
+../Middlewares/Third_Party/lvgl/src/drivers/display/ili9341/lv_ili9341.c:103:6:lv_ili9341_set_gamma_curve	16	static
+../Middlewares/Third_Party/lvgl/src/drivers/display/ili9341/lv_ili9341.c:108:6:lv_ili9341_send_cmd_list	16	static

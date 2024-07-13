@@ -1,0 +1,3 @@
+../Middlewares/Third_Party/lvgl/src/draw/../misc/../font/../draw/../stdlib/lv_string.h:65:20:lv_memzero	1
+../Middlewares/Third_Party/lvgl/src/draw/lv_draw_mask.c:39:28:lv_draw_mask_rect_dsc_init	1
+../Middlewares/Third_Party/lvgl/src/draw/lv_draw_mask.c:44:28:lv_draw_mask_rect	4

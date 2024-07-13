@@ -1,0 +1,4 @@
+../Middlewares/Third_Party/lvgl/examples/widgets/label/../../../src/core/../misc/../font/../draw/../misc/lv_color.h:286:26:lv_color_make	24	static
+../Middlewares/Third_Party/lvgl/examples/widgets/label/../../../src/core/../misc/../font/../draw/../misc/lv_color.h:422:26:lv_color_black	16	static
+../Middlewares/Third_Party/lvgl/examples/widgets/label/../../../src/core/../display/lv_display.h:392:26:lv_screen_active	8	static
+../Middlewares/Third_Party/lvgl/examples/widgets/label/lv_example_label_2.c:7:6:lv_example_label_2	32	static

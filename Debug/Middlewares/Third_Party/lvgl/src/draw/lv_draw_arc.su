@@ -1,0 +1,6 @@
+../Middlewares/Third_Party/lvgl/src/draw/../core/../misc/../font/../draw/../misc/lv_color.h:286:26:lv_color_make	24	static
+../Middlewares/Third_Party/lvgl/src/draw/../core/../misc/../font/../draw/../misc/lv_color.h:422:26:lv_color_black	16	static
+../Middlewares/Third_Party/lvgl/src/draw/../core/../misc/../font/../draw/../stdlib/lv_string.h:65:20:lv_memzero	16	static
+../Middlewares/Third_Party/lvgl/src/draw/lv_draw_arc.c:38:6:lv_draw_arc_dsc_init	24	static
+../Middlewares/Third_Party/lvgl/src/draw/lv_draw_arc.c:46:6:lv_draw_arc	40	static
+../Middlewares/Third_Party/lvgl/src/draw/lv_draw_arc.c:69:6:lv_draw_arc_get_area	56	static

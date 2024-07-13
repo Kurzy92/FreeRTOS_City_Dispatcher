@@ -1,0 +1,6 @@
+../Middlewares/Third_Party/lvgl/src/draw/../core/../misc/../font/../draw/../misc/lv_color.h:286:26:lv_color_make	1
+../Middlewares/Third_Party/lvgl/src/draw/../core/../misc/../font/../draw/../misc/lv_color.h:413:26:lv_color_white	1
+../Middlewares/Third_Party/lvgl/src/draw/../core/../misc/../font/../draw/../misc/lv_color.h:422:26:lv_color_black	1
+../Middlewares/Third_Party/lvgl/src/draw/../core/../misc/../font/../draw/../stdlib/lv_string.h:65:20:lv_memzero	1
+../Middlewares/Third_Party/lvgl/src/draw/lv_draw_triangle.c:39:6:lv_draw_triangle_dsc_init	1
+../Middlewares/Third_Party/lvgl/src/draw/lv_draw_triangle.c:52:6:lv_draw_triangle	1

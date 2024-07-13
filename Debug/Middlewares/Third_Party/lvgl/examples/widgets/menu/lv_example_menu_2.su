@@ -1,0 +1,4 @@
+../Middlewares/Third_Party/lvgl/examples/widgets/menu/../../../src/core/../display/lv_display.h:392:26:lv_screen_active	8	static
+../Middlewares/Third_Party/lvgl/examples/widgets/menu/../../../src/core/lv_obj_pos.h:184:20:lv_obj_center	16	static
+../Middlewares/Third_Party/lvgl/examples/widgets/menu/lv_example_menu_2.c:4:13:back_event_handler	32	static
+../Middlewares/Third_Party/lvgl/examples/widgets/menu/lv_example_menu_2.c:17:6:lv_example_menu_2	40	static

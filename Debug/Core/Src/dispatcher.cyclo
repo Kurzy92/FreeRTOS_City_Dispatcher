@@ -1,3 +1,2 @@
-../Core/Src/dispatcher.c:44:6:initDispatcher	1
-../Core/Src/dispatcher.c:48:6:vDispatcherCode	7
-../Core/Src/dispatcher.c:96:6:generateDispatcherMSG	11
+../Core/Src/dispatcher.c:59:6:vDispatcherCode	7
+../Core/Src/dispatcher.c:113:6:generateDispatcherMSG	11

@@ -1,0 +1,16 @@
+../Middlewares/Third_Party/lvgl/src/misc/cache/lv_cache.c:42:14:lv_cache_create	3
+../Middlewares/Third_Party/lvgl/src/misc/cache/lv_cache.c:66:6:lv_cache_destroy	2
+../Middlewares/Third_Party/lvgl/src/misc/cache/lv_cache.c:77:20:lv_cache_acquire	4
+../Middlewares/Third_Party/lvgl/src/misc/cache/lv_cache.c:90:6:lv_cache_release	4
+../Middlewares/Third_Party/lvgl/src/misc/cache/lv_cache.c:103:20:lv_cache_add	4
+../Middlewares/Third_Party/lvgl/src/misc/cache/lv_cache.c:116:20:lv_cache_acquire_or_create	6
+../Middlewares/Third_Party/lvgl/src/misc/cache/lv_cache.c:145:6:lv_cache_drop	3
+../Middlewares/Third_Party/lvgl/src/misc/cache/lv_cache.c:154:6:lv_cache_drop_all	2
+../Middlewares/Third_Party/lvgl/src/misc/cache/lv_cache.c:163:6:lv_cache_set_max_size	1
+../Middlewares/Third_Party/lvgl/src/misc/cache/lv_cache.c:168:8:lv_cache_get_max_size	1
+../Middlewares/Third_Party/lvgl/src/misc/cache/lv_cache.c:173:8:lv_cache_get_size	1
+../Middlewares/Third_Party/lvgl/src/misc/cache/lv_cache.c:178:8:lv_cache_get_free_size	1
+../Middlewares/Third_Party/lvgl/src/misc/cache/lv_cache.c:183:6:lv_cache_set_compare_cb	1
+../Middlewares/Third_Party/lvgl/src/misc/cache/lv_cache.c:188:6:lv_cache_set_create_cb	1
+../Middlewares/Third_Party/lvgl/src/misc/cache/lv_cache.c:193:6:lv_cache_set_free_cb	1
+../Middlewares/Third_Party/lvgl/src/misc/cache/lv_cache.c:201:13:cache_drop_internal_no_lock	3

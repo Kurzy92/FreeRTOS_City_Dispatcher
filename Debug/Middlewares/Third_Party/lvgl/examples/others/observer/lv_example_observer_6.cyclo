@@ -1,0 +1,16 @@
+../Middlewares/Third_Party/lvgl/examples/others/observer/../../../src/core/../misc/../font/../draw/../misc/lv_area.h:352:23:lv_pct	2
+../Middlewares/Third_Party/lvgl/examples/others/observer/../../../src/core/../misc/../font/../draw/../misc/lv_color.h:270:26:lv_color_hex	1
+../Middlewares/Third_Party/lvgl/examples/others/observer/../../../src/core/../misc/../font/../draw/../misc/lv_color.h:286:26:lv_color_make	1
+../Middlewares/Third_Party/lvgl/examples/others/observer/../../../src/core/../misc/../font/../draw/../misc/lv_color.h:318:26:lv_color_hex3	1
+../Middlewares/Third_Party/lvgl/examples/others/observer/../../../src/core/../misc/lv_style.h:558:20:lv_style_set_pad_all	1
+../Middlewares/Third_Party/lvgl/examples/others/observer/../../../src/core/../misc/lv_style.h:566:20:lv_style_set_pad_hor	1
+../Middlewares/Third_Party/lvgl/examples/others/observer/../../../src/core/../misc/lv_style.h:572:20:lv_style_set_pad_ver	1
+../Middlewares/Third_Party/lvgl/examples/others/observer/../../../src/core/../misc/lv_style.h:578:20:lv_style_set_pad_gap	1
+../Middlewares/Third_Party/lvgl/examples/others/observer/../../../src/core/../display/lv_display.h:392:26:lv_screen_active	1
+../Middlewares/Third_Party/lvgl/examples/others/observer/../../../src/core/lv_obj_pos.h:184:20:lv_obj_center	1
+../Middlewares/Third_Party/lvgl/examples/others/observer/lv_example_observer_6.c:18:6:lv_example_observer_6	1
+../Middlewares/Third_Party/lvgl/examples/others/observer/lv_example_observer_6.c:40:13:switch_theme_event_cb	2
+../Middlewares/Third_Party/lvgl/examples/others/observer/lv_example_observer_6.c:59:13:my_panel_style_observer_cb	3
+../Middlewares/Third_Party/lvgl/examples/others/observer/lv_example_observer_6.c:83:19:my_panel_create	2
+../Middlewares/Third_Party/lvgl/examples/others/observer/lv_example_observer_6.c:129:13:my_button_style_observer_cb	3
+../Middlewares/Third_Party/lvgl/examples/others/observer/lv_example_observer_6.c:157:19:my_button_create	2

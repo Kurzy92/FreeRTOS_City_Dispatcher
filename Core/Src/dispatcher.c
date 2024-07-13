@@ -7,31 +7,41 @@
 
 #include "dispatcher.h"
 
-static const char vAMBstrings[AMB_STRINGS_LEN][MAX_MSG_LENGTH] = { AMBstr1,
-																	AMBstr2,
-																	AMBstr3,
-																	AMBstr4,
-																	AMBstr5,
-																	AMBstr6,
-																	AMBstr7,
-																	AMBstr8};
 
+/**
+ * @brief Ambulance messages.
+ */
+static const char vAMBstrings[AMB_STRINGS_LEN][MAX_MSG_LENGTH] = { 		AMBstr1,
+																		AMBstr2,
+																		AMBstr3,
+																		AMBstr4,
+																		AMBstr5,
+																		AMBstr6,
+																		AMBstr7,
+																		AMBstr8};
+/**
+ * @brief Police messages.
+ */
 static const char vPOLstrings[POLICE_STRINGS_LEN][MAX_MSG_LENGTH] = { 	POLstr1,
 																		POLstr2,
 																		POLstr3,
 																		POLstr4,
 																		POLstr5};
-
-static const char vFIREstrings[FIRE_STRINGS_LEN][MAX_MSG_LENGTH] = { FIREstr1,
-																	FIREstr2,
-																	FIREstr3,
-																	FIREstr4,
-																	FIREstr5,
-																	FIREstr6,
-																	FIREstr7,
-																	FIREstr8,
-																	FIREstr9};
-
+/**
+ * @brief Fire department messages.
+ */
+static const char vFIREstrings[FIRE_STRINGS_LEN][MAX_MSG_LENGTH] = { 	FIREstr1,
+																		FIREstr2,
+																		FIREstr3,
+																		FIREstr4,
+																		FIREstr5,
+																		FIREstr6,
+																		FIREstr7,
+																		FIREstr8,
+																		FIREstr9};
+/**
+ * @brief Corona messages.
+ */
 static const char vCORstrings[CORONA_STRINGS_LEN][MAX_MSG_LENGTH] = { 	CORstr1,
 																		CORstr2,
 																		CORstr3,
@@ -41,10 +51,11 @@ static const char vCORstrings[CORONA_STRINGS_LEN][MAX_MSG_LENGTH] = { 	CORstr1,
 																		CORstr7,
 																		CORstr8};
 
-void initDispatcher(void) {
-
-}
-
+/**
+ * @brief Dispatcher task code.
+ *
+ * @param pvParameters Pointer to the parameters passed to the task.
+ */
 void vDispatcherCode(void *pvParameters) {
 	configASSERT(((uint32_t) pvParameters) == 1);
 	uint32_t ulNotificationValue;
@@ -93,6 +104,12 @@ void vDispatcherCode(void *pvParameters) {
 	}
 }
 
+
+/**
+ * @brief Generates a dispatcher message.
+ *
+ * @param hDispPacket Pointer to the dispatcher packet structure.
+ */
 void generateDispatcherMSG(DispatcherPacket* hDispPacket) {
 	/*
 	 * TODO: Consider creating a Mutex for when trying to modify hDispPacket.

@@ -1,13 +1,26 @@
-../Core/Src/main.c:116:5:main	24	static
-../Core/Src/main.c:215:6:SystemClock_Config	88	static
-../Core/Src/main.c:261:13:MX_RNG_Init	8	static
-../Core/Src/main.c:287:13:MX_TIM2_Init	40	static
-../Core/Src/main.c:332:13:MX_USART3_UART_Init	8	static
-../Core/Src/main.c:367:13:MX_USB_OTG_FS_PCD_Init	8	static
-../Core/Src/main.c:402:13:MX_GPIO_Init	56	static
-../Core/Src/main.c:485:6:initTasks	120	static
-../Core/Src/main.c:598:6:initQueues	8	static
-../Core/Src/main.c:632:6:vHandleCall	40	static,ignoring_inline_asm
-../Core/Src/main.c:669:6:HAL_RNG_ReadyDataCallback	24	static
-../Core/Src/main.c:690:6:HAL_TIM_PeriodElapsedCallback	144	static,ignoring_inline_asm
-../Core/Src/main.c:727:6:Error_Handler	4	static,ignoring_inline_asm
+D:/Embedded/RTED College/City_Dispatch_Sim/city_dispatch/Middlewares/Third_Party/lvgl/src/drivers/display/ili9341/../lcd/../../../display/../misc/lv_color.h:212:23:lv_color_format_get_size	16	static
+D:/Embedded/RTED College/City_Dispatch_Sim/city_dispatch/Middlewares/Third_Party/lvgl/src/drivers/display/ili9341/../lcd/../../../display/../misc/lv_color.h:286:26:lv_color_make	24	static
+D:/Embedded/RTED College/City_Dispatch_Sim/city_dispatch/Middlewares/Third_Party/lvgl/src/drivers/display/ili9341/../lcd/../../../display/../misc/lv_color.h:413:26:lv_color_white	16	static
+D:/Embedded/RTED College/City_Dispatch_Sim/city_dispatch/Middlewares/Third_Party/lvgl/src/drivers/display/ili9341/../lcd/../../../display/../misc/lv_color.h:422:26:lv_color_black	16	static
+D:/Embedded/RTED College/City_Dispatch_Sim/city_dispatch/Middlewares/Third_Party/lvgl/src/drivers/display/ili9341/../lcd/../../../display/lv_display.h:392:26:lv_screen_active	8	static
+../Core/Src/main.c:128:5:main	32	static,ignoring_inline_asm
+../Core/Src/main.c:237:6:SystemClock_Config	88	static
+../Core/Src/main.c:283:13:MX_RNG_Init	8	static
+../Core/Src/main.c:309:13:MX_SPI1_Init	8	static
+../Core/Src/main.c:349:13:MX_TIM2_Init	40	static
+../Core/Src/main.c:394:13:MX_USART3_UART_Init	8	static
+../Core/Src/main.c:429:13:MX_USB_OTG_FS_PCD_Init	8	static
+../Core/Src/main.c:462:13:MX_DMA_Init	16	static
+../Core/Src/main.c:480:13:MX_GPIO_Init	56	static
+../Core/Src/main.c:597:6:initTasks	120	static
+../Core/Src/main.c:713:6:initQueues	8	static
+../Core/Src/main.c:750:6:vHandleCall	40	static,ignoring_inline_asm
+../Core/Src/main.c:787:6:HAL_RNG_ReadyDataCallback	24	static
+../Core/Src/main.c:802:6:lcd_color_transfer_ready_cb	16	static
+../Core/Src/main.c:811:16:lcd_io_init	8	static
+../Core/Src/main.c:829:13:lcd_send_cmd	24	static
+../Core/Src/main.c:854:13:lcd_send_color	24	static
+../Core/Src/main.c:879:6:LVGL_Task	40	static
+../Core/Src/main.c:922:6:ui_init	32	static
+../Core/Src/main.c:953:6:HAL_TIM_PeriodElapsedCallback	144	static,ignoring_inline_asm
+../Core/Src/main.c:990:6:Error_Handler	4	static,ignoring_inline_asm

@@ -1,0 +1,5 @@
+../Middlewares/Third_Party/lvgl/src/widgets/list/lv_list.c:63:12:lv_list_create	1
+../Middlewares/Third_Party/lvgl/src/widgets/list/lv_list.c:72:12:lv_list_add_text	1
+../Middlewares/Third_Party/lvgl/src/widgets/list/lv_list.c:82:12:lv_list_add_button	3
+../Middlewares/Third_Party/lvgl/src/widgets/list/lv_list.c:106:14:lv_list_get_button_text	3
+../Middlewares/Third_Party/lvgl/src/widgets/list/lv_list.c:121:6:lv_list_set_button_text	3

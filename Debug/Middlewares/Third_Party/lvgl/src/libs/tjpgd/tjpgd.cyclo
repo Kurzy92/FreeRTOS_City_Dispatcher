@@ -1,0 +1,11 @@
+../Middlewares/Third_Party/lvgl/src/libs/tjpgd/tjpgd.c:132:15:alloc_pool	2
+../Middlewares/Third_Party/lvgl/src/libs/tjpgd/tjpgd.c:158:16:create_qt_tbl	6
+../Middlewares/Third_Party/lvgl/src/libs/tjpgd/tjpgd.c:194:16:create_huffman_tbl	14
+../Middlewares/Third_Party/lvgl/src/libs/tjpgd/tjpgd.c:285:12:huffext	12
+../Middlewares/Third_Party/lvgl/src/libs/tjpgd/tjpgd.c:438:12:bitext	8
+../Middlewares/Third_Party/lvgl/src/libs/tjpgd/tjpgd.c:534:9:jd_restart	7
+../Middlewares/Third_Party/lvgl/src/libs/tjpgd/tjpgd.c:610:13:block_idct	3
+../Middlewares/Third_Party/lvgl/src/libs/tjpgd/tjpgd.c:735:9:jd_mcu_load	20
+../Middlewares/Third_Party/lvgl/src/libs/tjpgd/tjpgd.c:826:9:jd_mcu_output	13
+../Middlewares/Third_Party/lvgl/src/libs/tjpgd/tjpgd.c:940:9:jd_prepare	53
+../Middlewares/Third_Party/lvgl/src/libs/tjpgd/tjpgd.c:1101:9:jd_decomp	9

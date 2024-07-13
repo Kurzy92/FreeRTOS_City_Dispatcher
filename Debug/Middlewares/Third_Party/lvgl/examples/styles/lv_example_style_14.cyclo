@@ -1,0 +1,4 @@
+../Middlewares/Third_Party/lvgl/examples/styles/../../src/core/../display/lv_display.h:392:26:lv_screen_active	1
+../Middlewares/Third_Party/lvgl/examples/styles/lv_example_style_14.c:8:13:new_theme_apply_cb	2
+../Middlewares/Third_Party/lvgl/examples/styles/lv_example_style_14.c:17:13:new_theme_init_and_set	1
+../Middlewares/Third_Party/lvgl/examples/styles/lv_example_style_14.c:41:6:lv_example_style_14	1

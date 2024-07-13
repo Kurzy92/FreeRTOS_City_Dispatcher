@@ -1,0 +1,7 @@
+../Middlewares/Third_Party/lvgl/src/font/lv_font_fmt_txt.c:74:14:lv_font_get_bitmap_fmt_txt	36
+../Middlewares/Third_Party/lvgl/src/font/lv_font_fmt_txt.c:167:6:lv_font_get_glyph_dsc_fmt_txt	7
+../Middlewares/Third_Party/lvgl/src/font/lv_font_fmt_txt.c:215:17:get_glyph_dsc_id	10
+../Middlewares/Third_Party/lvgl/src/font/lv_font_fmt_txt.c:264:15:get_kern_value	8
+../Middlewares/Third_Party/lvgl/src/font/lv_font_fmt_txt.c:320:16:kern_pair_8_compare	2
+../Middlewares/Third_Party/lvgl/src/font/lv_font_fmt_txt.c:331:16:kern_pair_16_compare	2
+../Middlewares/Third_Party/lvgl/src/font/lv_font_fmt_txt.c:551:16:unicode_list_compare	1

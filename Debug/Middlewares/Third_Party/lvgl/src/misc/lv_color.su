@@ -1,0 +1,15 @@
+../Middlewares/Third_Party/lvgl/src/misc/lv_color.h:286:26:lv_color_make	24	static
+../Middlewares/Third_Party/lvgl/src/misc/lv_color.h:413:26:lv_color_white	16	static
+../Middlewares/Third_Party/lvgl/src/misc/lv_color.h:422:26:lv_color_black	16	static
+../Middlewares/Third_Party/lvgl/src/misc/lv_color_op.h:49:48:lv_color_mix	32	static
+../Middlewares/Third_Party/lvgl/src/misc/lv_color.c:44:9:lv_color_format_get_bpp	16	static
+../Middlewares/Third_Party/lvgl/src/misc/lv_color.c:76:6:lv_color_format_has_alpha	16	static
+../Middlewares/Third_Party/lvgl/src/misc/lv_color.c:95:14:lv_color_to_32	24	static
+../Middlewares/Third_Party/lvgl/src/misc/lv_color.c:105:10:lv_color_to_u16	16	static
+../Middlewares/Third_Party/lvgl/src/misc/lv_color.c:110:10:lv_color_to_u32	16	static
+../Middlewares/Third_Party/lvgl/src/misc/lv_color.c:115:12:lv_color_lighten	24	static
+../Middlewares/Third_Party/lvgl/src/misc/lv_color.c:121:12:lv_color_darken	24	static
+../Middlewares/Third_Party/lvgl/src/misc/lv_color.c:126:12:lv_color_hsv_to_rgb	32	static
+../Middlewares/Third_Party/lvgl/src/misc/lv_color.c:184:16:lv_color_rgb_to_hsv	48	static
+../Middlewares/Third_Party/lvgl/src/misc/lv_color.c:235:16:lv_color_to_hsv	24	static
+../Middlewares/Third_Party/lvgl/src/misc/lv_color.c:256:19:lv_color_filter_shade_cb	32	static

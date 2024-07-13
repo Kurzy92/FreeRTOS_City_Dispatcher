@@ -1,0 +1,12 @@
+../Middlewares/Third_Party/lvgl/src/draw/sw/../../misc/../font/../draw/../misc/lv_area.h:139:23:lv_area_get_width	16	static
+../Middlewares/Third_Party/lvgl/src/draw/sw/../../misc/../font/../draw/../misc/lv_area.h:149:23:lv_area_get_height	16	static
+../Middlewares/Third_Party/lvgl/src/draw/sw/../../misc/../font/../draw/../misc/lv_color.h:212:23:lv_color_format_get_size	16	static
+../Middlewares/Third_Party/lvgl/src/draw/sw/../../misc/../font/../draw/../misc/lv_color.h:260:20:lv_color32_eq	16	static
+../Middlewares/Third_Party/lvgl/src/draw/sw/../../misc/../font/../draw/../misc/lv_color.h:347:46:lv_color_16_16_mix	32	static
+../Middlewares/Third_Party/lvgl/src/draw/sw/../../misc/../font/../draw/../misc/lv_color_op.h:67:28:lv_color_mix32	24	static
+../Middlewares/Third_Party/lvgl/src/draw/sw/lv_draw_sw_transform.c:82:6:lv_draw_sw_transform	280	static
+../Middlewares/Third_Party/lvgl/src/draw/sw/lv_draw_sw_transform.c:244:13:transform_rgb888	96	static
+../Middlewares/Third_Party/lvgl/src/draw/sw/lv_draw_sw_transform.c:340:13:transform_argb8888	88	static
+../Middlewares/Third_Party/lvgl/src/draw/sw/lv_draw_sw_transform.c:433:13:transform_rgb565a8	104	static
+../Middlewares/Third_Party/lvgl/src/draw/sw/lv_draw_sw_transform.c:541:13:transform_a8	72	static
+../Middlewares/Third_Party/lvgl/src/draw/sw/lv_draw_sw_transform.c:615:13:transform_point_upscaled	24	static

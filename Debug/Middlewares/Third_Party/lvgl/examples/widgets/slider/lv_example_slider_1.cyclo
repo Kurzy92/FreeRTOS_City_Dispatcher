@@ -1,0 +1,5 @@
+../Middlewares/Third_Party/lvgl/examples/widgets/slider/../../../src/core/../display/lv_display.h:392:26:lv_screen_active	1
+../Middlewares/Third_Party/lvgl/examples/widgets/slider/../../../src/core/lv_obj_pos.h:184:20:lv_obj_center	1
+../Middlewares/Third_Party/lvgl/examples/widgets/slider/../../../src/widgets/slider/lv_slider.h:123:23:lv_slider_get_value	1
+../Middlewares/Third_Party/lvgl/examples/widgets/slider/lv_example_slider_1.c:10:6:lv_example_slider_1	1
+../Middlewares/Third_Party/lvgl/examples/widgets/slider/lv_example_slider_1.c:25:13:slider_event_cb	1

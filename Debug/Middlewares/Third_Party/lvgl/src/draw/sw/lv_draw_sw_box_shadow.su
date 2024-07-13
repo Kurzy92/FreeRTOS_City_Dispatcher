@@ -1,0 +1,7 @@
+../Middlewares/Third_Party/lvgl/src/draw/sw/../../misc/../font/../draw/../misc/lv_area.h:126:20:lv_area_copy	16	static
+../Middlewares/Third_Party/lvgl/src/draw/sw/../../misc/../font/../draw/../misc/lv_area.h:139:23:lv_area_get_width	16	static
+../Middlewares/Third_Party/lvgl/src/draw/sw/../../misc/../font/../draw/../misc/lv_area.h:149:23:lv_area_get_height	16	static
+../Middlewares/Third_Party/lvgl/src/draw/sw/../../misc/../font/../draw/../stdlib/lv_string.h:65:20:lv_memzero	16	static
+../Middlewares/Third_Party/lvgl/src/draw/sw/lv_draw_sw_box_shadow.c:55:6:lv_draw_sw_box_shadow	328	static
+../Middlewares/Third_Party/lvgl/src/draw/sw/lv_draw_sw_box_shadow.c:570:35:shadow_draw_corner_buf	144	static
+../Middlewares/Third_Party/lvgl/src/draw/sw/lv_draw_sw_box_shadow.c:657:35:shadow_blur_corner	88	static

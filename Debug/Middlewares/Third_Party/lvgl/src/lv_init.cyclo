@@ -1,0 +1,6 @@
+../Middlewares/Third_Party/lvgl/src/core/../draw/../misc/../font/../draw/../stdlib/lv_string.h:65:20:lv_memzero	1
+../Middlewares/Third_Party/lvgl/src/lv_init.c:78:20:lv_global_init	3
+../Middlewares/Third_Party/lvgl/src/lv_init.c:106:20:_lv_cleanup_devices	3
+../Middlewares/Third_Party/lvgl/src/lv_init.c:117:6:lv_is_initialized	1
+../Middlewares/Third_Party/lvgl/src/lv_init.c:127:6:lv_init	4
+../Middlewares/Third_Party/lvgl/src/lv_init.c:312:6:lv_deinit	3

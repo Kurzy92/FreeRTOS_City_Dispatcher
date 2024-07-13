@@ -1,0 +1,6 @@
+../Middlewares/Third_Party/lvgl/examples/event/../../src/core/../misc/../font/../draw/../misc/lv_color.h:270:26:lv_color_hex	1
+../Middlewares/Third_Party/lvgl/examples/event/../../src/core/../display/lv_display.h:392:26:lv_screen_active	1
+../Middlewares/Third_Party/lvgl/examples/event/../../src/core/lv_obj_pos.h:184:20:lv_obj_center	1
+../Middlewares/Third_Party/lvgl/examples/event/lv_example_event_4.c:8:13:timer_cb	4
+../Middlewares/Third_Party/lvgl/examples/event/lv_example_event_4.c:18:13:event_cb	2
+../Middlewares/Third_Party/lvgl/examples/event/lv_example_event_4.c:48:6:lv_example_event_4	1
