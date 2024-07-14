@@ -178,7 +178,7 @@ int main(void)
 		  (void*) 1,
 		  configMAX_PRIORITIES,
 		  &vInitTaskHandle);
-
+  configASSERT(status ==  pdTRUE);
   xTasksDataMutex = xSemaphoreCreateMutex();
   xPrintfMutex = xSemaphoreCreateMutex();
   /* add threads, ... */
