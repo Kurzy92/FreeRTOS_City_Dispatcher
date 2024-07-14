@@ -18,7 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
+#include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -51,8 +51,6 @@ UART_HandleTypeDef huart3;
 
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
-/* Definitions for defaultTask */
-
 /* USER CODE BEGIN PV */
 
 // QUEUE Handles
@@ -71,20 +69,27 @@ TaskHandle_t vCoronaTasks[CORONA_TASKS];
 TaskHandle_t vDispatcherTask;
 TaskHandle_t vInitTaskHandle;
 
+// TASKS Status Arrays and their
+bool bAmbTasksStatus[AMBULANCE_TASKS] = {false};
+SemaphoreHandle_t AmbTasksStatusMutex;
+bool bPolTasksStatus[POLICE_TASKS] = {false};
+SemaphoreHandle_t PolTasksStatusMutex;
+bool bFireTasksStatus[FIRE_TASKS] = {false};
+SemaphoreHandle_t FireTasksStatusMutex;
+bool bCorTasksStatus[CORONA_TASKS] = {false};
+SemaphoreHandle_t CorTasksStatusMutex;
+
+// Print to console mutex
+SemaphoreHandle_t printfMutex;
+
 // TASKS Data Objects
-float total_tasks_time;
-uint32_t total_tasks_ran;
-float average_task_time;
+float total_tasks_time = 0;
+uint32_t total_tasks_ran = 0;
+float average_task_time = 0.0f;
 SemaphoreHandle_t xTasksDataMutex;
 SemaphoreHandle_t xPrintfMutex;
 
 
-
-
-DispatcherPacket dispPack = {
-		POLICE,
-		"help!"
-};
 
 /* USER CODE END PV */
 
@@ -95,12 +100,12 @@ static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_RNG_Init(void);
 static void MX_TIM2_Init(void);
-void StartDefaultTask(void *argument);
 
 /* USER CODE BEGIN PFP */
 void vHandleCall(void* pvParameters);
 void initQueues(void);
 void initTasks(void);
+void initSemaphores(void);
 //void initTasks(void);
 /* USER CODE END PFP */
 
@@ -115,6 +120,7 @@ void initTasks(void);
   */
 int main(void)
 {
+
   /* USER CODE BEGIN 1 */
 	total_tasks_time = 0;
   /* USER CODE END 1 */
@@ -145,33 +151,15 @@ int main(void)
 
   /* USER CODE END 2 */
 
-  /* Init scheduler */
-  //osKernelInitialize();
-
-  /* USER CODE BEGIN RTOS_MUTEX */
-  /* add mutexes, ... */
-  /* USER CODE END RTOS_MUTEX */
-
-  /* USER CODE BEGIN RTOS_SEMAPHORES */
-  /* add semaphores, ... */
-  /* USER CODE END RTOS_SEMAPHORES */
-
-  /* USER CODE BEGIN RTOS_TIMERS */
-  /* start timers, add new ones, ... */
-  /* USER CODE END RTOS_TIMERS */
-
-  /* USER CODE BEGIN RTOS_QUEUES */
-  /* add queues, ... */
+  initSemaphores();
   initQueues();
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
   /* creation of defaultTask */
-  //defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   BaseType_t status;
-  //initTasks();
   status = xTaskCreate((TaskFunction_t)initTasks,
 		  "init_task",
 		  configMINIMAL_STACK_SIZE,
@@ -179,8 +167,6 @@ int main(void)
 		  configMAX_PRIORITIES,
 		  &vInitTaskHandle);
   configASSERT(status ==  pdTRUE);
-  xTasksDataMutex = xSemaphoreCreateMutex();
-  xPrintfMutex = xSemaphoreCreateMutex();
   /* add threads, ... */
 
   /* USER CODE END RTOS_THREADS */
@@ -193,7 +179,6 @@ int main(void)
   /* USER CODE END RTOS_EVENTS */
 
   /* Start scheduler */
-  //osKernelStart();
 
   /* We should never get here as control is now taken by the scheduler */
 
@@ -220,7 +205,7 @@ void SystemClock_Config(void)
   /** Configure the main internal regulator output voltage
   */
   __HAL_RCC_PWR_CLK_ENABLE();
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
@@ -230,10 +215,17 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = 4;
-  RCC_OscInitStruct.PLL.PLLN = 72;
+  RCC_OscInitStruct.PLL.PLLN = 216;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
-  RCC_OscInitStruct.PLL.PLLQ = 3;
+  RCC_OscInitStruct.PLL.PLLQ = 9;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Activate the Over-Drive mode
+  */
+  if (HAL_PWREx_EnableOverDrive() != HAL_OK)
   {
     Error_Handler();
   }
@@ -244,10 +236,10 @@ void SystemClock_Config(void)
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_7) != HAL_OK)
   {
     Error_Handler();
   }
@@ -298,9 +290,9 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 8399;
+  htim2.Init.Prescaler = TIM2_PRESCALER_SET;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 49;
+  htim2.Init.Period = TIM2_PERIOD_SET;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -488,38 +480,66 @@ void initTasks(void) {
 	 *       and will initialize it.
 	 *       This will replace initializing each array specifically.
 	 */
-	printf("Starting initTasks task! \r\n");
-	fflush(stdout);
+	//portENTER_CRITICAL();
+	if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
+		portENTER_CRITICAL();
+		printf("Starting initTasks task! \r\n");
+		fflush(stdout);
+		xSemaphoreGive(printfMutex);
+		portEXIT_CRITICAL();
+	}
 	/* AMBULANCE TASK INIT */
 	for(int i=0; i<AMBULANCE_TASKS; i++) {
+		taskInit_t* ambulance_taskInit = (taskInit_t*)pvPortMalloc(sizeof(taskInit_t));
+		configASSERT(ambulance_taskInit != NULL);
+
+		ambulance_taskInit->department = AMBULANCE;
+		ambulance_taskInit->taskIdentifier = i;
+		ambulance_taskInit->pQhandler = &qAmbulance;
+		ambulance_taskInit->pSemHandler = &AmbTasksStatusMutex;
+
 		BaseType_t status;
 		char taskName[configMAX_TASK_NAME_LEN];
 		snprintf(taskName, configMAX_TASK_NAME_LEN, "Ambulance_%d", i);
 	 	status = xTaskCreate(vHandleCall,
 	 							taskName,
 								TASKS_MEMORY_SIZE,
-								(void*) 1,
+								(void*)ambulance_taskInit,
 								HANDLE_TASKS_PRIORITY,
 								&vAmbulanceTasks[i]);
 	 	if(status != pdTRUE) {
 	 		/* TODO: handle this error */
+	 		vPortFree(ambulance_taskInit);
 	 		printf("Starting Ambulance Threads Failed! \r\n");
 	 		fflush(stdout);
 	 		return;
 	 	}
 	}
-	printf("Started Ambulance Threads! \r\n");
-	fflush(stdout);
+	if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
+		portENTER_CRITICAL();
+		printf("Started Ambulance Threads! \r\n");
+		fflush(stdout);
+		xSemaphoreGive(printfMutex);
+		portEXIT_CRITICAL();
+	}
+
 
 	/* POLICE TASK INIT */
 	for(int i=0; i<POLICE_TASKS; i++) {
+		taskInit_t* police_taskInit = (taskInit_t*)pvPortMalloc(sizeof(taskInit_t));
+		configASSERT(police_taskInit != NULL);
+
+		police_taskInit->department = POLICE;
+		police_taskInit->taskIdentifier = i;
+		police_taskInit->pQhandler = &qPolice;
+		police_taskInit->pSemHandler = &PolTasksStatusMutex;
 		BaseType_t status;
 		char taskName[configMAX_TASK_NAME_LEN];
 		snprintf(taskName, configMAX_TASK_NAME_LEN, "Police_%d", i);
 	 	status = xTaskCreate(vHandleCall,
 	 							taskName,
 								TASKS_MEMORY_SIZE,
-								(void*) 1,
+								(void*) police_taskInit,
 								HANDLE_TASKS_PRIORITY,
 								&vPoliceTasks[i]);
 	 	if(status != pdTRUE) {
@@ -527,17 +547,30 @@ void initTasks(void) {
 	 		return;
 	 	}
 	}
-	printf("Started Police Threads! \r\n");
-	fflush(stdout);
+	if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
+		portENTER_CRITICAL();
+		printf("Started Police Threads! \r\n");
+		fflush(stdout);
+		xSemaphoreGive(printfMutex);
+		portEXIT_CRITICAL();
+	}
+
 	/* FIRE DEP TASK INIT */
 	for(int i=0; i<FIRE_TASKS; i++) {
+		taskInit_t* fire_taskInit = (taskInit_t*)pvPortMalloc(sizeof(taskInit_t));
+		configASSERT(fire_taskInit != NULL);
+
+		fire_taskInit->department = FIRE;
+		fire_taskInit->taskIdentifier = i;
+		fire_taskInit->pQhandler = &qFire;
+		fire_taskInit->pSemHandler = &FireTasksStatusMutex;
 		BaseType_t status;
 		char taskName[configMAX_TASK_NAME_LEN];
 		snprintf(taskName, configMAX_TASK_NAME_LEN, "Fire_%d", i);
 	 	status = xTaskCreate(vHandleCall,
 	 							taskName,
 								TASKS_MEMORY_SIZE,
-								(void*) 1,
+								(void*) fire_taskInit,
 								HANDLE_TASKS_PRIORITY,
 								&vFireTasks[i]);
 	 	if(status != pdTRUE) {
@@ -545,17 +578,28 @@ void initTasks(void) {
 	 		return;
 	 	}
 	}
-	printf("Started Fire Dep Threads! \r\n");
-	fflush(stdout);
+	if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
+		printf("Started Fire Dep Threads! \r\n");
+		fflush(stdout);
+		xSemaphoreGive(printfMutex);
+	}
+
 	/* CORONA TASK INIT */
 	for(int i=0; i<CORONA_TASKS; i++) {
+		taskInit_t* corona_taskInit = (taskInit_t*)pvPortMalloc(sizeof(taskInit_t));
+		configASSERT(corona_taskInit != NULL);
+
+		corona_taskInit->department = CORONA;
+		corona_taskInit->taskIdentifier = i;
+		corona_taskInit->pQhandler = &qCorona;
+		corona_taskInit->pSemHandler = &CorTasksStatusMutex;
 		BaseType_t status;
 		char taskName[configMAX_TASK_NAME_LEN];
 		snprintf(taskName, configMAX_TASK_NAME_LEN, "Corona_%d", i);
 	 	status = xTaskCreate(vHandleCall,
 	 							taskName,
 								TASKS_MEMORY_SIZE,
-								(void*) 1,
+								(void*) corona_taskInit,
 								HANDLE_TASKS_PRIORITY,
 								&vCoronaTasks[i]);
 	 	if(status != pdTRUE) {
@@ -563,8 +607,13 @@ void initTasks(void) {
 	 		return;
 	 	}
 	}
-	printf("Started Corona Threads! \r\n");
-	fflush(stdout);
+	if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
+		printf("Started Corona Threads! \r\n");
+		fflush(stdout);
+		xSemaphoreGive(printfMutex);
+	}
+
+	vTaskDelay(100);
 
 	BaseType_t status = xTaskCreate(vDispatcherCode,
 							"Dispatcher_Task",
@@ -575,15 +624,22 @@ void initTasks(void) {
 	if(status != pdTRUE) {
 		return;
 	}
-	printf("Started Dispatcher Thread! \r\n");
-	fflush(stdout);
+	if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
+		printf("Started Dispatcher Thread! \r\n");
+		fflush(stdout);
+		xSemaphoreGive(printfMutex);
+	}
+
 
 	if(HAL_TIM_Base_Start_IT(&htim2) != HAL_OK) {
 		Error_Handler();
 	}
+	if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
+		printf("Timer interrupts enabled! \r\n");
+		fflush(stdout);
+		xSemaphoreGive(printfMutex);
+	}
 
-	printf("Timer interrupts enabled! \r\n");
-	fflush(stdout);
 	//vTaskDelay(100);
 	//if(HAL_RNG_GenerateRandomNumber_IT(&hrng) != HAL_OK) {
 	//	Error_Handler();
@@ -628,25 +684,39 @@ void initQueues(void) {
 }
 
 
-
 void vHandleCall(void* pvParameters) {
-	configASSERT(((uint32_t) pvParameters) == 1);
 	uint32_t ulNotifictionValue;
 	TickType_t startTick, endTick, totalTicks;
+	taskInit_t* pTaskInit = (taskInit_t*)pvParameters;
 	/*
 	 * TODO: log the task has been created before transitioning to BLOCKED state.
 	 */
-	//vTaskDelay(1000);
-	//HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
+
+	char printMSG[100];
+	snprintf(printMSG, 100, "New %s task created! \r\nTask index is %d \r\n"
+			,GET_ENUM_DEPARTMENT_STR(pTaskInit->department)
+			, pTaskInit->taskIdentifier);
+	if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
+		portENTER_CRITICAL();
+		printf(printMSG);
+		fflush(stdout);
+		xSemaphoreGive(printfMutex);
+		portEXIT_CRITICAL();
+	}
 	for(;;) {
 		/* TODO: log a message that this task is created and it's waiting for a job */
 
 		xTaskNotifyWait(0x00, 0x00, &ulNotifictionValue, portMAX_DELAY);
+		// Get starting time tick count
 		startTick = xTaskGetTickCount();
-		/*
-		 * PERFORM TASK
-		 */
+		// Get packet from the queue handler
+		DispatcherPacket new_packet;
+		xQueueReceive(*(pTaskInit->pQhandler), &new_packet, portMAX_DELAY);
+
+		// Wait for the job to get done
+		vTaskDelayUntil(&startTick, new_packet.timeToHandleInTicks);
+
+		// Update shared app data
 		if(xTasksDataMutex != NULL) {
 			if(xSemaphoreTake(xTasksDataMutex, portMAX_DELAY) == pdTRUE) {
 				total_tasks_ran++;
@@ -662,9 +732,26 @@ void vHandleCall(void* pvParameters) {
 				 */
 			}
 		}
-
+		// Indicate the task is now available for the next incoming packet.
+		if(pTaskInit->pSemHandler != NULL) {
+			if(xSemaphoreTake(*(pTaskInit->pSemHandler), portMAX_DELAY)) {
+				bAmbTasksStatus[pTaskInit->taskIdentifier] = true;
+			}
+		}
 	}
 }
+
+
+void initSemaphores(void) {
+	printfMutex = xSemaphoreCreateMutex();
+	xTasksDataMutex = xSemaphoreCreateMutex();
+	xPrintfMutex = xSemaphoreCreateMutex();
+	AmbTasksStatusMutex = xSemaphoreCreateMutex();
+	PolTasksStatusMutex = xSemaphoreCreateMutex();
+	FireTasksStatusMutex = xSemaphoreCreateMutex();
+	CorTasksStatusMutex = xSemaphoreCreateMutex();
+}
+
 
 void HAL_RNG_ReadyDataCallback(RNG_HandleTypeDef *hrng, uint32_t random32bit)
 {
@@ -678,6 +765,7 @@ void HAL_RNG_ReadyDataCallback(RNG_HandleTypeDef *hrng, uint32_t random32bit)
 
 }
 /* USER CODE END 4 */
+
 
 /**
   * @brief  Period elapsed callback in non blocking mode
@@ -695,7 +783,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		generateDispatcherMSG(&new_packet);
 		BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 		UBaseType_t qItems = uxQueueMessagesWaitingFromISR( qDispatcher );
-		UBaseType_t uxHighWaterMark = uxTaskGetStackHighWaterMark(vDispatcherTask);
+		//UBaseType_t uxHighWaterMark = uxTaskGetStackHighWaterMark(vDispatcherTask);
 		if( qItems != TASKS_QUEUE_SIZE) {
 			xQueueSendFromISR(qDispatcher, &new_packet, NULL);
 			xTaskNotifyFromISR(vDispatcherTask, 0x00, eNoAction, &xHigherPriorityTaskWoken);

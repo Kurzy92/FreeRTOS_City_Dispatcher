@@ -39,6 +39,7 @@ extern "C" {
 #include "FreeRTOSConfig.h"
 #include "queue.h"
 #include "semphr.h"
+#include "utils.h"
 
 
 /* USER CODE END Includes */
@@ -57,13 +58,23 @@ extern QueueHandle_t qFire;
 extern QueueHandle_t qCorona;
 extern QueueHandle_t qLogger;
 
+extern TaskHandle_t vAmbulanceTasks[AMBULANCE_TASKS];
+extern TaskHandle_t vPoliceTasks[POLICE_TASKS];
+extern TaskHandle_t vFireTasks[FIRE_TASKS];
+extern TaskHandle_t vCoronaTasks[CORONA_TASKS];
+
 extern RNG_HandleTypeDef hrng;
 
-extern DispatcherPacket dispPack;
+//extern DispatcherPacket dispPack;
 
 extern SemaphoreHandle_t xTasksDataMutex;
-extern SemaphoreHandle_t xPrintfMutex;
+extern SemaphoreHandle_t printfMutex;
 extern uint32_t total_tasks_ran;
+
+extern bool bAmbTasksStatus[AMBULANCE_TASKS];
+extern bool bPolTasksStatus[POLICE_TASKS];
+extern bool bFireTasksStatus[FIRE_TASKS];
+extern bool bCorTasksStatus[CORONA_TASKS];
 
 /* USER CODE END EC */
 

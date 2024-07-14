@@ -1,3 +1,8 @@
-../Core/Src/dispatcher.c:44:6:initDispatcher	1
-../Core/Src/dispatcher.c:48:6:vDispatcherCode	7
-../Core/Src/dispatcher.c:96:6:generateDispatcherMSG	11
+../Core/Src/dispatcher.c:51:6:initDispatcher	1
+../Core/Src/dispatcher.c:55:6:vDispatcherCode	3
+../Core/Src/dispatcher.c:81:6:packetRouting	9
+../Core/Src/dispatcher.c:120:15:getAvailableAmbulanceTask	3
+../Core/Src/dispatcher.c:129:15:getAvailablePoliceeTask	3
+../Core/Src/dispatcher.c:138:15:getAvailableFireTask	3
+../Core/Src/dispatcher.c:147:15:getAvailableCoronaTask	3
+../Core/Src/dispatcher.c:157:6:generateDispatcherMSG	11

@@ -7,6 +7,13 @@
 
 #include "dispatcher.h"
 
+static int8_t getAvailableAmbulanceTask(void);
+static int8_t getAvailablePoliceeTask(void);
+static int8_t getAvailableFireTask(void);
+static int8_t getAvailableCoronaTask(void);
+void packetRouting(DispatcherPacket* new_packet);
+
+
 static const char vAMBstrings[AMB_STRINGS_LEN][MAX_MSG_LENGTH] = { AMBstr1,
 																	AMBstr2,
 																	AMBstr3,
@@ -58,7 +65,6 @@ void vDispatcherCode(void *pvParameters) {
 		fflush(stdout);
 		DispatcherPacket new_packet;
 		if( xQueueReceive(qDispatcher, &new_packet, portMAX_DELAY) == pdPASS) {
-			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, GPIO_PIN_RESET);
 			printf("Dispatcher routing received packet! \r\n");
 			fflush(stdout);
 			xSemaphoreTake(xTasksDataMutex, portMAX_DELAY);
@@ -66,39 +72,94 @@ void vDispatcherCode(void *pvParameters) {
 			printf("Total Tasks Ran: %d \r\n", (int)total_tasks_ran);
 			fflush(stdout);
 			xSemaphoreGive(xTasksDataMutex);
-			switch(new_packet.department) {
-				case AMBULANCE:
-					xQueueSend(qAmbulance, &new_packet, portMAX_DELAY);
-					printf("Packet sent to Ambulance queue! \r\n");
-					fflush(stdout);
+			packetRouting(&new_packet);
 
-					break;
-				case POLICE:
-					xQueueSend(qPolice, &new_packet, portMAX_DELAY);
-					printf("Packet sent to Police queue! \r\n");
-					fflush(stdout);
-					break;
-				case FIRE:
-					xQueueSend(qFire, &new_packet, portMAX_DELAY);
-					printf("Packet sent to Fire Dep queue! \r\n");
-					fflush(stdout);
-					break;
-				case CORONA:
-					xQueueSend(qCorona, &new_packet, portMAX_DELAY);
-					printf("Packet sent to Corona queue! \r\n");
-					fflush(stdout);
-					break;
-			}
 		}
 	}
 }
+
+void packetRouting(DispatcherPacket* new_packet) {
+	switch(new_packet->department) {
+		case AMBULANCE:
+			xQueueSend(qAmbulance, &new_packet, portMAX_DELAY);
+			if(xSemaphoreTake(printfMutex, portMAX_DELAY)) {
+				printf("Packet sent to Ambulance queue! \r\n");
+				fflush(stdout);
+				xSemaphoreGive(printfMutex);
+			}
+
+			break;
+		case POLICE:
+			xQueueSend(qPolice, &new_packet, portMAX_DELAY);
+			if(xSemaphoreTake(printfMutex, portMAX_DELAY)) {
+				printf("Packet sent to Police queue! \r\n");
+				fflush(stdout);
+				xSemaphoreGive(printfMutex);
+			}
+			break;
+		case FIRE:
+			xQueueSend(qFire, &new_packet, portMAX_DELAY);
+			if(xSemaphoreTake(printfMutex, portMAX_DELAY)) {
+				printf("Packet sent to Fire Dep queue! \r\n");
+				fflush(stdout);
+				xSemaphoreGive(printfMutex);
+			}
+
+			break;
+		case CORONA:
+			xQueueSend(qCorona, &new_packet, portMAX_DELAY);
+			if(xSemaphoreTake(printfMutex, portMAX_DELAY)) {
+				printf("Packet sent to Corona queue! \r\n");
+				fflush(stdout);
+				xSemaphoreGive(printfMutex);
+			}
+			break;
+	}
+}
+
+static int8_t getAvailableAmbulanceTask(void) {
+	for(int i = 0; i < AMBULANCE_TASKS; i++) {
+		if(bAmbTasksStatus[i] == false) {
+			return (int8_t)i;
+		}
+	}
+	return -1;
+}
+
+static int8_t getAvailablePoliceeTask(void) {
+	for(int i = 0; i < POLICE_TASKS; i++) {
+		if(bPolTasksStatus[i] == false) {
+			return (int8_t)i;
+		}
+	}
+	return -1;
+}
+
+static int8_t getAvailableFireTask(void) {
+	for(int i = 0; i < FIRE_TASKS; i++) {
+		if(bFireTasksStatus[i] == false) {
+			return (int8_t)i;
+		}
+	}
+	return -1;
+}
+
+static int8_t getAvailableCoronaTask(void) {
+	for(int i = 0; i < CORONA_TASKS; i++) {
+		if(bCorTasksStatus[i] == false) {
+			return (int8_t)i;
+		}
+	}
+	return -1;
+}
+
 
 void generateDispatcherMSG(DispatcherPacket* hDispPacket) {
 	/*
 	 * TODO: Consider creating a Mutex for when trying to modify hDispPacket.
 	 * 		 It's also used in the TIM2 Interrupt Handler.
 	 */
-	enum DepartmentsEnum dep;
+	DepartmentsEnum dep;
 	uint8_t msgIdx = 0;
 
 	// Generate Department

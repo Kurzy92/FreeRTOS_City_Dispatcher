@@ -9,6 +9,9 @@
 #define INC_DEFS_H_
 
 #include "stdint.h"
+#include "FreeRTOS.h"
+#include "queue.h"
+#include "semphr.h"
 
 #define AMBULANCE_TASKS 4
 #define POLICE_TASKS 3
@@ -31,25 +34,42 @@
 #define MIN_TIM2_IT_PERIOD	100 	// in milliseconds
 #define MAX_TIM2_IT_PERIOD	500 // in milliseconds
 
-enum DepartmentsEnum {
+#define TIM2_PRESCALER_SET	539
+#define TIM2_PERIOD_SET		3999
+
+#define GET_ENUM_DEPARTMENT_STR(x)	( \
+						(x)==AMBULANCE ? "AMBULANCE": \
+						(x)==POLICE? "Police": \
+						(x)==FIRE? "Fire Dep" : \
+						(x)==CORONA? "Corona"  : \
+						"unknown dep" \
+						)
+
+typedef enum  {
 	AMBULANCE = 0,
 	POLICE,
 	FIRE,
 	CORONA
-};
+} DepartmentsEnum;
 
 typedef struct _Department {
-	enum DepartmentsEnum name;
+	DepartmentsEnum name;
 	uint8_t maxResources;
 	uint8_t currentUsedResources;
 	/* Create a semaphore for this type? */
 } Department_t;
 
 typedef struct _DispatcherPacket {
-	enum DepartmentsEnum department;
+	DepartmentsEnum department;
 	char message[MAX_MSG_LENGTH];
 	uint16_t timeToHandleInTicks;
 } DispatcherPacket;
 
+typedef struct _taskInit_t {
+	DepartmentsEnum department;
+	uint8_t taskIdentifier;
+	QueueHandle_t* pQhandler;
+	SemaphoreHandle_t* pSemHandler;
+} taskInit_t;
 
 #endif /* INC_DEFS_H_ */
