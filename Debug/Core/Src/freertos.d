@@ -50,7 +50,7 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
- ../Core/Inc/FreeRTOSConfig.h ../Core/Inc/utils.h ../Core/Inc/main.h \
+ ../Core/Inc/FreeRTOSConfig.h \
  D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/task_handling.h
 ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
 ../Core/Inc/FreeRTOSConfig.h:
@@ -105,6 +105,4 @@ D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/defs.h
 ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h:
 ../Core/Inc/FreeRTOSConfig.h:
-../Core/Inc/utils.h:
-../Core/Inc/main.h:
 D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/task_handling.h:

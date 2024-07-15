@@ -140,8 +140,9 @@ void vHandleCall(void* pvParameters) {
 			continue;
 		}
 
-		// Wait for the job to get done
-		vTaskDelayUntil(&startTick, new_packet.timeToHandleInTicks);
+		// Wait for the job to get done.
+		// TODO: Should vTaskDelayUntil be used?
+		vTaskDelay(new_packet.timeToHandleInTicks);
 		if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
 			printf("Handled task: %s \r\n", new_packet.message);
 			fflush(stdout);
@@ -154,9 +155,14 @@ void vHandleCall(void* pvParameters) {
 				total_tasks_ran++;
 				endTick = xTaskGetTickCount();
 				totalTicks = endTick - startTick;
-				taskENTER_CRITICAL();
-				total_tasks_time += (float)totalTicks/configTICK_RATE_HZ;
-				taskEXIT_CRITICAL();
+				total_tasks_time += (float)totalTicks / configTICK_RATE_HZ;
+				average_task_time = (float)total_tasks_ran/total_tasks_time;
+				/*
+				 * TODO: Calculating the average_task_time in this task is a waste
+				 * 		 of resources. Data calculation should be done in its own
+				 * 		 lower priority task and only run when printing of data
+				 * 		 is required.
+				 */
 				xSemaphoreGive(xTasksDataMutex);
 			} else {
 				/*

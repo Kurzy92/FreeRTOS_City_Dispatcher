@@ -50,7 +50,7 @@ Core/Src/stm32f7xx_it.o: ../Core/Src/stm32f7xx_it.c ../Core/Inc/main.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
- ../Core/Inc/FreeRTOSConfig.h ../Core/Inc/utils.h ../Core/Inc/main.h \
+ ../Core/Inc/FreeRTOSConfig.h \
  D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/task_handling.h \
  ../Core/Inc/stm32f7xx_it.h
 ../Core/Inc/main.h:
@@ -106,7 +106,5 @@ D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/defs.h
 ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h:
 ../Core/Inc/FreeRTOSConfig.h:
-../Core/Inc/utils.h:
-../Core/Inc/main.h:
 D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/task_handling.h:
 ../Core/Inc/stm32f7xx_it.h:

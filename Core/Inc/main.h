@@ -39,7 +39,6 @@ extern "C" {
 #include "FreeRTOSConfig.h"
 #include "queue.h"
 #include "semphr.h"
-#include "utils.h"
 #include "task_handling.h"
 
 
