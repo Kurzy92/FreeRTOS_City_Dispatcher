@@ -40,6 +40,7 @@ extern "C" {
 #include "queue.h"
 #include "semphr.h"
 #include "utils.h"
+#include "task_handling.h"
 
 
 /* USER CODE END Includes */
@@ -75,6 +76,16 @@ extern bool bAmbTasksStatus[AMBULANCE_TASKS];
 extern bool bPolTasksStatus[POLICE_TASKS];
 extern bool bFireTasksStatus[FIRE_TASKS];
 extern bool bCorTasksStatus[CORONA_TASKS];
+
+extern SemaphoreHandle_t AmbTasksStatusMutex;
+extern SemaphoreHandle_t PolTasksStatusMutex;
+extern SemaphoreHandle_t FireTasksStatusMutex;
+extern SemaphoreHandle_t CorTasksStatusMutex;
+
+extern float total_tasks_time;
+extern uint32_t total_tasks_ran;
+extern float average_task_time;
+extern int8_t current_running_tasks;
 
 /* USER CODE END EC */
 

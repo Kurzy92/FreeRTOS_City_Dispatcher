@@ -77,10 +77,10 @@ void HAL_MspInit(void)
 
   /* USER CODE BEGIN MspInit 1 */
 
-  HAL_NVIC_SetPriority(RNG_IRQn, 5, 0);
+  HAL_NVIC_SetPriority(RNG_IRQn, configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY -1  , 0);
   HAL_NVIC_EnableIRQ(HASH_RNG_IRQn);
 
-  HAL_NVIC_SetPriority(TIM2_IRQn, 5, 0);
+  HAL_NVIC_SetPriority(TIM2_IRQn, configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY -1, 0);
   HAL_NVIC_EnableIRQ(TIM2_IRQn);
 
   HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);

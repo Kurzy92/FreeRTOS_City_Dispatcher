@@ -68,6 +68,7 @@ TaskHandle_t vFireTasks[FIRE_TASKS];
 TaskHandle_t vCoronaTasks[CORONA_TASKS];
 TaskHandle_t vDispatcherTask;
 TaskHandle_t vInitTaskHandle;
+TaskHandle_t vTasksManagerTask;
 
 // TASKS Status Arrays and their
 bool bAmbTasksStatus[AMBULANCE_TASKS] = {false};
@@ -86,8 +87,10 @@ SemaphoreHandle_t printfMutex;
 float total_tasks_time = 0;
 uint32_t total_tasks_ran = 0;
 float average_task_time = 0.0f;
+int8_t current_running_tasks = 0;
+
 SemaphoreHandle_t xTasksDataMutex;
-SemaphoreHandle_t xPrintfMutex;
+
 
 
 
@@ -102,7 +105,7 @@ static void MX_RNG_Init(void);
 static void MX_TIM2_Init(void);
 
 /* USER CODE BEGIN PFP */
-void vHandleCall(void* pvParameters);
+
 void initQueues(void);
 void initTasks(void);
 void initSemaphores(void);
@@ -122,7 +125,7 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-	total_tasks_time = 0;
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -478,9 +481,8 @@ void initTasks(void) {
 	/* TODO: consider creating a dedicated function to initialize the tasks,
 	 *       the function will receive the address of the tasks array, and its size,
 	 *       and will initialize it.
-	 *       This will replace initializing each array specifically.
+	 *       This will replace initializing each array separately.
 	 */
-	//portENTER_CRITICAL();
 	if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
 		portENTER_CRITICAL();
 		printf("Starting initTasks task! \r\n");
@@ -497,11 +499,13 @@ void initTasks(void) {
 		ambulance_taskInit->taskIdentifier = i;
 		ambulance_taskInit->pQhandler = &qAmbulance;
 		ambulance_taskInit->pSemHandler = &AmbTasksStatusMutex;
+		ambulance_taskInit->bTaskStatusArr = bAmbTasksStatus;
+		ambulance_taskInit->numOfTasks = AMBULANCE_TASKS;
 
 		BaseType_t status;
 		char taskName[configMAX_TASK_NAME_LEN];
 		snprintf(taskName, configMAX_TASK_NAME_LEN, "Ambulance_%d", i);
-	 	status = xTaskCreate(vHandleCall,
+	 	status = xTaskCreate((TaskFunction_t)vHandleCall,
 	 							taskName,
 								TASKS_MEMORY_SIZE,
 								(void*)ambulance_taskInit,
@@ -533,10 +537,13 @@ void initTasks(void) {
 		police_taskInit->taskIdentifier = i;
 		police_taskInit->pQhandler = &qPolice;
 		police_taskInit->pSemHandler = &PolTasksStatusMutex;
+		police_taskInit->bTaskStatusArr = bPolTasksStatus;
+		police_taskInit->numOfTasks = POLICE_TASKS;
+
 		BaseType_t status;
 		char taskName[configMAX_TASK_NAME_LEN];
 		snprintf(taskName, configMAX_TASK_NAME_LEN, "Police_%d", i);
-	 	status = xTaskCreate(vHandleCall,
+	 	status = xTaskCreate((TaskFunction_t)vHandleCall,
 	 							taskName,
 								TASKS_MEMORY_SIZE,
 								(void*) police_taskInit,
@@ -564,10 +571,12 @@ void initTasks(void) {
 		fire_taskInit->taskIdentifier = i;
 		fire_taskInit->pQhandler = &qFire;
 		fire_taskInit->pSemHandler = &FireTasksStatusMutex;
+		fire_taskInit->bTaskStatusArr = bFireTasksStatus;
+		fire_taskInit->numOfTasks = FIRE_TASKS;
 		BaseType_t status;
 		char taskName[configMAX_TASK_NAME_LEN];
 		snprintf(taskName, configMAX_TASK_NAME_LEN, "Fire_%d", i);
-	 	status = xTaskCreate(vHandleCall,
+	 	status = xTaskCreate((TaskFunction_t)vHandleCall,
 	 							taskName,
 								TASKS_MEMORY_SIZE,
 								(void*) fire_taskInit,
@@ -593,10 +602,13 @@ void initTasks(void) {
 		corona_taskInit->taskIdentifier = i;
 		corona_taskInit->pQhandler = &qCorona;
 		corona_taskInit->pSemHandler = &CorTasksStatusMutex;
+		corona_taskInit->bTaskStatusArr = bCorTasksStatus;
+		corona_taskInit->numOfTasks = CORONA_TASKS;
+
 		BaseType_t status;
 		char taskName[configMAX_TASK_NAME_LEN];
 		snprintf(taskName, configMAX_TASK_NAME_LEN, "Corona_%d", i);
-	 	status = xTaskCreate(vHandleCall,
+	 	status = xTaskCreate((TaskFunction_t)vHandleCall,
 	 							taskName,
 								TASKS_MEMORY_SIZE,
 								(void*) corona_taskInit,
@@ -615,11 +627,11 @@ void initTasks(void) {
 
 	vTaskDelay(100);
 
-	BaseType_t status = xTaskCreate(vDispatcherCode,
+	BaseType_t status = xTaskCreate((TaskFunction_t)vDispatcherCode,
 							"Dispatcher_Task",
 							TASKS_MEMORY_SIZE,
 							(void*)1,
-							HANDLE_TASKS_PRIORITY,
+							DISPATCHER_TASK_PRIORITY,
 							&vDispatcherTask);
 	if(status != pdTRUE) {
 		return;
@@ -629,6 +641,13 @@ void initTasks(void) {
 		fflush(stdout);
 		xSemaphoreGive(printfMutex);
 	}
+
+	status = xTaskCreate((TaskFunction_t)tasksManagerTask,
+						"tasks_manager",
+						TASKS_MEMORY_SIZE,
+						(void*)1,
+						MANAGER_TASK_PRIORITY,
+						&vTasksManagerTask);
 
 
 	if(HAL_TIM_Base_Start_IT(&htim2) != HAL_OK) {
@@ -684,72 +703,34 @@ void initQueues(void) {
 }
 
 
-void vHandleCall(void* pvParameters) {
-	uint32_t ulNotifictionValue;
-	TickType_t startTick, endTick, totalTicks;
-	taskInit_t* pTaskInit = (taskInit_t*)pvParameters;
-	/*
-	 * TODO: log the task has been created before transitioning to BLOCKED state.
-	 */
 
-	char printMSG[100];
-	snprintf(printMSG, 100, "New %s task created! \r\nTask index is %d \r\n"
-			,GET_ENUM_DEPARTMENT_STR(pTaskInit->department)
-			, pTaskInit->taskIdentifier);
-	if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
-		portENTER_CRITICAL();
-		printf(printMSG);
-		fflush(stdout);
-		xSemaphoreGive(printfMutex);
-		portEXIT_CRITICAL();
-	}
-	for(;;) {
-		/* TODO: log a message that this task is created and it's waiting for a job */
-
-		xTaskNotifyWait(0x00, 0x00, &ulNotifictionValue, portMAX_DELAY);
-		// Get starting time tick count
-		startTick = xTaskGetTickCount();
-		// Get packet from the queue handler
-		DispatcherPacket new_packet;
-		xQueueReceive(*(pTaskInit->pQhandler), &new_packet, portMAX_DELAY);
-
-		// Wait for the job to get done
-		vTaskDelayUntil(&startTick, new_packet.timeToHandleInTicks);
-
-		// Update shared app data
-		if(xTasksDataMutex != NULL) {
-			if(xSemaphoreTake(xTasksDataMutex, portMAX_DELAY) == pdTRUE) {
-				total_tasks_ran++;
-				endTick = xTaskGetTickCount();
-				totalTicks = endTick - startTick;
-				taskENTER_CRITICAL();
-				total_tasks_time += (float)totalTicks/configTICK_RATE_HZ;
-				taskEXIT_CRITICAL();
-				xSemaphoreGive(xTasksDataMutex);
-			} else {
-				/*
-				 * The mutex couldn't be obtained. Code should never get here.
-				 */
-			}
-		}
-		// Indicate the task is now available for the next incoming packet.
-		if(pTaskInit->pSemHandler != NULL) {
-			if(xSemaphoreTake(*(pTaskInit->pSemHandler), portMAX_DELAY)) {
-				bAmbTasksStatus[pTaskInit->taskIdentifier] = true;
-			}
-		}
-	}
-}
 
 
 void initSemaphores(void) {
 	printfMutex = xSemaphoreCreateMutex();
+	if(printfMutex == NULL) {
+		return;
+	}
 	xTasksDataMutex = xSemaphoreCreateMutex();
-	xPrintfMutex = xSemaphoreCreateMutex();
+	if(printfMutex == NULL) {
+		return;
+	}
 	AmbTasksStatusMutex = xSemaphoreCreateMutex();
+	if(printfMutex == NULL) {
+		return;
+	}
 	PolTasksStatusMutex = xSemaphoreCreateMutex();
+	if(printfMutex == NULL) {
+		return;
+	}
 	FireTasksStatusMutex = xSemaphoreCreateMutex();
+	if(printfMutex == NULL) {
+		return;
+	}
 	CorTasksStatusMutex = xSemaphoreCreateMutex();
+	if(printfMutex == NULL) {
+		return;
+	}
 }
 
 

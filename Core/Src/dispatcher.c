@@ -7,10 +7,7 @@
 
 #include "dispatcher.h"
 
-static int8_t getAvailableAmbulanceTask(void);
-static int8_t getAvailablePoliceeTask(void);
-static int8_t getAvailableFireTask(void);
-static int8_t getAvailableCoronaTask(void);
+
 void packetRouting(DispatcherPacket* new_packet);
 
 
@@ -48,14 +45,18 @@ static const char vCORstrings[CORONA_STRINGS_LEN][MAX_MSG_LENGTH] = { 	CORstr1,
 																		CORstr7,
 																		CORstr8};
 
-void initDispatcher(void) {
 
-}
-
+/**
+ * @brief Task function for the dispatcher.
+ *
+ * This function implements the dispatcher task, which waits for notifications
+ * to process and route incoming dispatcher packets to the appropriate department queues.
+ *
+ * @param pvParameters Parameters passed to the task (expected to be `1`).
+ */
 void vDispatcherCode(void *pvParameters) {
 	configASSERT(((uint32_t) pvParameters) == 1);
 	uint32_t ulNotificationValue;
-
 	for(;;) {
 		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, GPIO_PIN_SET);
 		printf("Dispatcher Entered BLOCKED state! \r\n");
@@ -65,12 +66,8 @@ void vDispatcherCode(void *pvParameters) {
 		fflush(stdout);
 		DispatcherPacket new_packet;
 		if( xQueueReceive(qDispatcher, &new_packet, portMAX_DELAY) == pdPASS) {
-			printf("Dispatcher routing received packet! \r\n");
-			fflush(stdout);
 			xSemaphoreTake(xTasksDataMutex, portMAX_DELAY);
 			total_tasks_ran++;
-			printf("Total Tasks Ran: %d \r\n", (int)total_tasks_ran);
-			fflush(stdout);
 			xSemaphoreGive(xTasksDataMutex);
 			packetRouting(&new_packet);
 
@@ -78,82 +75,43 @@ void vDispatcherCode(void *pvParameters) {
 	}
 }
 
+
+/**
+ * @brief Routes a dispatcher packet to the appropriate department queue.
+ *
+ * This function sends the given dispatcher packet to the queue corresponding
+ * to its department.
+ *
+ * @param new_packet Pointer to the DispatcherPacket to be routed.
+ */
 void packetRouting(DispatcherPacket* new_packet) {
 	switch(new_packet->department) {
 		case AMBULANCE:
-			xQueueSend(qAmbulance, &new_packet, portMAX_DELAY);
-			if(xSemaphoreTake(printfMutex, portMAX_DELAY)) {
-				printf("Packet sent to Ambulance queue! \r\n");
-				fflush(stdout);
-				xSemaphoreGive(printfMutex);
-			}
-
+			xQueueSend(qAmbulance, new_packet, portMAX_DELAY);
 			break;
 		case POLICE:
-			xQueueSend(qPolice, &new_packet, portMAX_DELAY);
-			if(xSemaphoreTake(printfMutex, portMAX_DELAY)) {
-				printf("Packet sent to Police queue! \r\n");
-				fflush(stdout);
-				xSemaphoreGive(printfMutex);
-			}
+			xQueueSend(qPolice, new_packet, portMAX_DELAY);
 			break;
 		case FIRE:
-			xQueueSend(qFire, &new_packet, portMAX_DELAY);
-			if(xSemaphoreTake(printfMutex, portMAX_DELAY)) {
-				printf("Packet sent to Fire Dep queue! \r\n");
-				fflush(stdout);
-				xSemaphoreGive(printfMutex);
-			}
-
+			xQueueSend(qFire, new_packet, portMAX_DELAY);
 			break;
 		case CORONA:
-			xQueueSend(qCorona, &new_packet, portMAX_DELAY);
-			if(xSemaphoreTake(printfMutex, portMAX_DELAY)) {
-				printf("Packet sent to Corona queue! \r\n");
-				fflush(stdout);
-				xSemaphoreGive(printfMutex);
-			}
+			xQueueSend(qCorona, new_packet, portMAX_DELAY);
 			break;
 	}
 }
 
-static int8_t getAvailableAmbulanceTask(void) {
-	for(int i = 0; i < AMBULANCE_TASKS; i++) {
-		if(bAmbTasksStatus[i] == false) {
-			return (int8_t)i;
-		}
-	}
-	return -1;
-}
-
-static int8_t getAvailablePoliceeTask(void) {
-	for(int i = 0; i < POLICE_TASKS; i++) {
-		if(bPolTasksStatus[i] == false) {
-			return (int8_t)i;
-		}
-	}
-	return -1;
-}
-
-static int8_t getAvailableFireTask(void) {
-	for(int i = 0; i < FIRE_TASKS; i++) {
-		if(bFireTasksStatus[i] == false) {
-			return (int8_t)i;
-		}
-	}
-	return -1;
-}
-
-static int8_t getAvailableCoronaTask(void) {
-	for(int i = 0; i < CORONA_TASKS; i++) {
-		if(bCorTasksStatus[i] == false) {
-			return (int8_t)i;
-		}
-	}
-	return -1;
-}
 
 
+
+/**
+ * @brief Generate a dispatcher message.
+ *
+ * This function generates a dispatcher message based on a random department and message.
+ * It also sets the time required to handle the task in ticks.
+ *
+ * @param hDispPacket Pointer to the DispatcherPacket to be filled with generated data.
+ */
 void generateDispatcherMSG(DispatcherPacket* hDispPacket) {
 	/*
 	 * TODO: Consider creating a Mutex for when trying to modify hDispPacket.

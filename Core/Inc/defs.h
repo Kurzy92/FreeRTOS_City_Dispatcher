@@ -12,6 +12,7 @@
 #include "FreeRTOS.h"
 #include "queue.h"
 #include "semphr.h"
+#include "stdbool.h"
 
 #define AMBULANCE_TASKS 4
 #define POLICE_TASKS 3
@@ -19,14 +20,11 @@
 #define CORONA_TASKS 4
 #define MAX_TOTAL_CONCURRENT_TASKS 10
 #define TASKS_QUEUE_SIZE 10
-#define TASKS_MEMORY_SIZE	configMINIMAL_STACK_SIZE
+#define TASKS_MEMORY_SIZE	500
 
 #define HANDLE_TASKS_PRIORITY (configMAX_PRIORITIES - 10)
-
-#define FLAG_AMBULANCE 	(1 << 0) // 0x01
-#define FLAG_POLICE 	(1 << 1) // 0x02
-#define FLAG_FIRE		(1 << 2) // 0x04
-#define FLAG_CORONA		(1 << 3) // 0x08
+#define MANAGER_TASK_PRIORITY HANDLE_TASKS_PRIORITY-3
+#define DISPATCHER_TASK_PRIORITY	MANAGER_TASK_PRIORITY + 1
 
 #define MAX_NAME_LEN 12
 #define MAX_MSG_LENGTH	100
@@ -38,7 +36,7 @@
 #define TIM2_PERIOD_SET		3999
 
 #define GET_ENUM_DEPARTMENT_STR(x)	( \
-						(x)==AMBULANCE ? "AMBULANCE": \
+						(x)==AMBULANCE ? "Ambulance": \
 						(x)==POLICE? "Police": \
 						(x)==FIRE? "Fire Dep" : \
 						(x)==CORONA? "Corona"  : \
@@ -70,6 +68,8 @@ typedef struct _taskInit_t {
 	uint8_t taskIdentifier;
 	QueueHandle_t* pQhandler;
 	SemaphoreHandle_t* pSemHandler;
+	bool* bTaskStatusArr;
+	uint8_t numOfTasks;
 } taskInit_t;
 
 #endif /* INC_DEFS_H_ */
