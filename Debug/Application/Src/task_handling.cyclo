@@ -1,0 +1,8 @@
+../Application/Src/task_handling.c:32:6:tasksManagerTask	14
+../Application/Src/task_handling.c:114:6:vHandleCall	12
+../Application/Src/task_handling.c:185:13:addCurrentRunningTask	3
+../Application/Src/task_handling.c:201:13:removeCurrentRunningTask	3
+../Application/Src/task_handling.c:219:15:getAvailableAmbulanceTask	4
+../Application/Src/task_handling.c:241:15:getAvailablePoliceeTask	4
+../Application/Src/task_handling.c:263:15:getAvailableFireTask	4
+../Application/Src/task_handling.c:285:15:getAvailableCoronaTask	4

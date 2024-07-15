@@ -1,3 +1,0 @@
-../Core/Src/dispatcher.c:57:6:vDispatcherCode	3
-../Core/Src/dispatcher.c:87:6:packetRouting	5
-../Core/Src/dispatcher.c:115:6:generateDispatcherMSG	11

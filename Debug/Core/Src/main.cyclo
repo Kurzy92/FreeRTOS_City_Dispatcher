@@ -8,6 +8,5 @@
 ../Core/Src/main.c:480:6:initTasks	22
 ../Core/Src/main.c:673:6:initQueues	5
 ../Core/Src/main.c:709:6:initSemaphores	6
-../Core/Src/main.c:737:6:HAL_RNG_ReadyDataCallback	1
 ../Core/Src/main.c:759:6:HAL_TIM_PeriodElapsedCallback	6
 ../Core/Src/main.c:796:6:Error_Handler	1

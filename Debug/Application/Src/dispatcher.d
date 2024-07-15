@@ -1,5 +1,6 @@
-Core/Src/dispatcher.o: ../Core/Src/dispatcher.c ../Core/Inc/dispatcher.h \
- ../Core/Inc/defs.h \
+Application/Src/dispatcher.o: ../Application/Src/dispatcher.c \
+ D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/dispatcher.h \
+ D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/defs.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h \
  ../Core/Inc/FreeRTOSConfig.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h \
@@ -46,14 +47,13 @@ Core/Src/dispatcher.o: ../Core/Src/dispatcher.c ../Core/Inc/dispatcher.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_pcd.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_ll_usb.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_pcd_ex.h \
- ../Core/Inc/dispatcher.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
- ../Core/Inc/FreeRTOSConfig.h ../Core/Inc/utils.h \
- ../Core/Inc/task_handling.h
-../Core/Inc/dispatcher.h:
-../Core/Inc/defs.h:
+ ../Core/Inc/FreeRTOSConfig.h ../Core/Inc/utils.h ../Core/Inc/main.h \
+ D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/task_handling.h
+D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/dispatcher.h:
+D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/defs.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
 ../Core/Inc/FreeRTOSConfig.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h:
@@ -101,10 +101,10 @@ Core/Src/dispatcher.o: ../Core/Src/dispatcher.c ../Core/Inc/dispatcher.h \
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_pcd.h:
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_ll_usb.h:
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_pcd_ex.h:
-../Core/Inc/dispatcher.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h:
 ../Core/Inc/FreeRTOSConfig.h:
 ../Core/Inc/utils.h:
-../Core/Inc/task_handling.h:
+../Core/Inc/main.h:
+D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/task_handling.h:

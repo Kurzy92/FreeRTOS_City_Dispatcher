@@ -18,10 +18,6 @@ void vDispatcherCode(void *pvParameters);
 void generateDispatcherMSG(DispatcherPacket* hDispPacket);
 
 
-
-#define SHORTEST_TASK_DURATION_IN_TICKS		pdMS_TO_TICKS(10)
-#define LONGEST_TASK_DURATION_IN_TICKS		pdMS_TO_TICKS(300)
-
 /**************** Random Dispatcher Messages ****************/
 #define AMB_STRINGS_LEN 		8
 #define POLICE_STRINGS_LEN 		5

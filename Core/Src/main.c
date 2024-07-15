@@ -734,17 +734,17 @@ void initSemaphores(void) {
 }
 
 
-void HAL_RNG_ReadyDataCallback(RNG_HandleTypeDef *hrng, uint32_t random32bit)
-{
-  uint32_t randomPeriod = (random32bit % MAX_TIM2_IT_PERIOD) + MIN_TIM2_IT_PERIOD;
-
-  // Update timer IT period
-  __HAL_TIM_SET_AUTORELOAD(&htim2, randomPeriod * 2);
-  __HAL_TIM_SET_COUNTER(&htim2, 0);
-
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
-
-}
+//void HAL_RNG_ReadyDataCallback(RNG_HandleTypeDef *hrng, uint32_t random32bit)
+//{
+//  uint32_t randomPeriod = (random32bit % MAX_TIM2_IT_PERIOD) + MIN_TIM2_IT_PERIOD;
+//
+//  // Update timer IT period
+//  __HAL_TIM_SET_AUTORELOAD(&htim2, randomPeriod * 2);
+//  __HAL_TIM_SET_COUNTER(&htim2, 0);
+//
+//  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
+//
+//}
 /* USER CODE END 4 */
 
 

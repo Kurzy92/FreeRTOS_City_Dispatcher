@@ -14,27 +14,39 @@
 #include "semphr.h"
 #include "stdbool.h"
 
+// Tasks assigned resources
 #define AMBULANCE_TASKS 4
 #define POLICE_TASKS 3
 #define FIRE_TASKS 2
 #define CORONA_TASKS 4
 #define MAX_TOTAL_CONCURRENT_TASKS 10
+
+// Queue init configuration data
 #define TASKS_QUEUE_SIZE 10
 #define TASKS_MEMORY_SIZE	500
 
+// Tasks priority defines
 #define HANDLE_TASKS_PRIORITY (configMAX_PRIORITIES - 10)
 #define MANAGER_TASK_PRIORITY HANDLE_TASKS_PRIORITY-3
 #define DISPATCHER_TASK_PRIORITY	MANAGER_TASK_PRIORITY + 1
 
+// Calls message config data
 #define MAX_NAME_LEN 12
 #define MAX_MSG_LENGTH	100
 
-#define MIN_TIM2_IT_PERIOD	100 	// in milliseconds
-#define MAX_TIM2_IT_PERIOD	500 // in milliseconds
 
+//#define MIN_TIM2_IT_PERIOD	100 	// in milliseconds
+//#define MAX_TIM2_IT_PERIOD	500 // in milliseconds
+
+// TIM2 configuration defines
 #define TIM2_PRESCALER_SET	539
 #define TIM2_PERIOD_SET		3999
 
+// Calls handling times
+#define SHORTEST_TASK_DURATION_IN_TICKS		pdMS_TO_TICKS(1000)
+#define LONGEST_TASK_DURATION_IN_TICKS		pdMS_TO_TICKS(2000)
+
+// Get string from department enum
 #define GET_ENUM_DEPARTMENT_STR(x)	( \
 						(x)==AMBULANCE ? "Ambulance": \
 						(x)==POLICE? "Police": \
@@ -54,7 +66,6 @@ typedef struct _Department {
 	DepartmentsEnum name;
 	uint8_t maxResources;
 	uint8_t currentUsedResources;
-	/* Create a semaphore for this type? */
 } Department_t;
 
 typedef struct _DispatcherPacket {
