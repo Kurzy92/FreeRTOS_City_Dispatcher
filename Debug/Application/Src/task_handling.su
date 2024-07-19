@@ -1,8 +1,8 @@
 ../Application/Src/task_handling.c:32:6:tasksManagerTask	16	static,ignoring_inline_asm
 ../Application/Src/task_handling.c:114:6:vHandleCall	248	static
-../Application/Src/task_handling.c:185:13:addCurrentRunningTask	8	static
-../Application/Src/task_handling.c:201:13:removeCurrentRunningTask	8	static
-../Application/Src/task_handling.c:219:15:getAvailableAmbulanceTask	16	static
-../Application/Src/task_handling.c:241:15:getAvailablePoliceeTask	16	static
-../Application/Src/task_handling.c:263:15:getAvailableFireTask	16	static
-../Application/Src/task_handling.c:285:15:getAvailableCoronaTask	16	static
+../Application/Src/task_handling.c:191:13:addCurrentRunningTask	8	static
+../Application/Src/task_handling.c:207:13:removeCurrentRunningTask	8	static
+../Application/Src/task_handling.c:225:15:getAvailableAmbulanceTask	16	static
+../Application/Src/task_handling.c:247:15:getAvailablePoliceeTask	16	static
+../Application/Src/task_handling.c:269:15:getAvailableFireTask	16	static
+../Application/Src/task_handling.c:291:15:getAvailableCoronaTask	16	static
