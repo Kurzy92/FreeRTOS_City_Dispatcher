@@ -31,6 +31,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "defs.h"
 #include "dispatcher.h"
 #include "stdbool.h"
 #include "stdio.h"
@@ -40,6 +41,9 @@ extern "C" {
 #include "queue.h"
 #include "semphr.h"
 #include "task_handling.h"
+#include "timers.h"
+#include "error_handling.h"
+#include "init.h"
 
 
 /* USER CODE END Includes */
@@ -62,10 +66,14 @@ extern TaskHandle_t vAmbulanceTasks[AMBULANCE_TASKS];
 extern TaskHandle_t vPoliceTasks[POLICE_TASKS];
 extern TaskHandle_t vFireTasks[FIRE_TASKS];
 extern TaskHandle_t vCoronaTasks[CORONA_TASKS];
+extern TaskHandle_t vGetDataTask;
+extern TaskHandle_t vDispatcherTask;
+extern TaskHandle_t vTasksManagerTask;
+extern TaskHandle_t vGetDataTask;
 
 extern RNG_HandleTypeDef hrng;
+extern TIM_HandleTypeDef htim2;
 
-//extern DispatcherPacket dispPack;
 
 extern SemaphoreHandle_t xTasksDataMutex;
 extern SemaphoreHandle_t printfMutex;
@@ -86,6 +94,13 @@ extern uint32_t total_tasks_ran;
 extern float average_task_time;
 extern int8_t current_running_tasks;
 
+extern uint8_t available_amb_tasks;
+extern uint8_t available_police_tasks;
+extern uint8_t available_fire_tasks;
+extern uint8_t available_corona_tasks;
+extern bool btnFlag;
+
+
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
@@ -97,12 +112,13 @@ extern int8_t current_running_tasks;
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
+void DebounceTimerCallback(TimerHandle_t xTimer);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
 #define USER_Btn_Pin GPIO_PIN_13
 #define USER_Btn_GPIO_Port GPIOC
+#define USER_Btn_EXTI_IRQn EXTI15_10_IRQn
 #define MCO_Pin GPIO_PIN_0
 #define MCO_GPIO_Port GPIOH
 #define RMII_MDC_Pin GPIO_PIN_1
@@ -155,7 +171,9 @@ void Error_Handler(void);
 #define LD2_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
-
+// Data task defines
+#define DATA_GPIO_PORT 	GPIOC
+#define DATA_GPIO_PIN 	GPIO_PIN_13
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

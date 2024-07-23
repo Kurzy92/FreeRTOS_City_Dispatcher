@@ -8,11 +8,10 @@
 #ifndef INC_DISPATCHER_H_
 #define INC_DISPATCHER_H_
 
-#include "defs.h"
-#include "stdio.h"
+
 #include "main.h"
 #include "string.h"
-#include "task.h"
+
 
 void vDispatcherCode(void *pvParameters);
 void generateDispatcherMSG(DispatcherPacket* hDispPacket);

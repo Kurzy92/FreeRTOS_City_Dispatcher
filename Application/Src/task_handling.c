@@ -16,8 +16,8 @@ static int8_t getAvailableAmbulanceTask(void);
 static int8_t getAvailablePoliceeTask(void);
 static int8_t getAvailableFireTask(void);
 static int8_t getAvailableCoronaTask(void);
-static void removeCurrentRunningTask(void);
-static void addCurrentRunningTask(void);
+static void removeCurrentRunningTask(uint8_t* avail_dep_tasks);
+static void addCurrentRunningTask(uint8_t* avail_dep_tasks);
 
 
 
@@ -45,7 +45,7 @@ void tasksManagerTask(void) {
 						fflush(stdout);
 						xSemaphoreGive(printfMutex);
 					}
-					addCurrentRunningTask();
+					addCurrentRunningTask(&available_amb_tasks);
 					xTaskNotify(vAmbulanceTasks[newTaskIndex], 0, eNoAction);
 					continue;
 				}
@@ -59,7 +59,7 @@ void tasksManagerTask(void) {
 						fflush(stdout);
 						xSemaphoreGive(printfMutex);
 					}
-					addCurrentRunningTask();
+					addCurrentRunningTask(&available_police_tasks);
 					xTaskNotify(vPoliceTasks[newTaskIndex], 0, eNoAction);
 					continue;
 				}
@@ -74,7 +74,7 @@ void tasksManagerTask(void) {
 						fflush(stdout);
 						xSemaphoreGive(printfMutex);
 					}
-					addCurrentRunningTask();
+					addCurrentRunningTask(&available_fire_tasks);
 					xTaskNotify(vFireTasks[newTaskIndex], 0, eNoAction);
 					continue;
 				}
@@ -89,7 +89,7 @@ void tasksManagerTask(void) {
 						fflush(stdout);
 						xSemaphoreGive(printfMutex);
 					}
-					addCurrentRunningTask();
+					addCurrentRunningTask(&available_corona_tasks);
 					xTaskNotify(vCoronaTasks[newTaskIndex], 0, eNoAction);
 					continue;
 				}
@@ -130,11 +130,8 @@ void vHandleCall(void* pvParameters) {
 		/* TODO: log a message that this task is created and it's waiting for a job */
 
 		xTaskNotifyWait(0x00, 0x00, &ulNotifictionValue, portMAX_DELAY);
-		// Get starting time tick count
-		startTick = xTaskGetTickCount();
 
-		// Get packet from the queue handler
-		//DispatcherPacket new_packet;
+		startTick = xTaskGetTickCount();
 
 		if(!(xQueueReceive(*(pTaskInit->pQhandler), &new_packet, portMAX_DELAY) == pdTRUE)) {
 			continue;
@@ -156,7 +153,7 @@ void vHandleCall(void* pvParameters) {
 				endTick = xTaskGetTickCount();
 				totalTicks = endTick - startTick;
 				total_tasks_time += (float)totalTicks / configTICK_RATE_HZ;
-				average_task_time = (float)total_tasks_ran/total_tasks_time;
+				average_task_time = (float)total_tasks_time/total_tasks_ran;
 				/*
 				 * TODO: Calculating the average_task_time in this task is a waste
 				 * 		 of resources. Data calculation should be done in its own
@@ -173,7 +170,7 @@ void vHandleCall(void* pvParameters) {
 		// Indicate the task is now available for the next incoming packet.
 		if(*pTaskInit->pSemHandler != NULL) {
 			if(xSemaphoreTake(*(pTaskInit->pSemHandler), portMAX_DELAY) ==  pdTRUE) {
-				removeCurrentRunningTask();
+				removeCurrentRunningTask(new_packet.available_tasks_counter);
 				pTaskInit->bTaskStatusArr[pTaskInit->taskIdentifier] = false;
 				xSemaphoreGive(*(pTaskInit->pSemHandler));
 			}
@@ -188,10 +185,11 @@ void vHandleCall(void* pvParameters) {
  * This function safely increments the count of currently running tasks
  * using a semaphore to ensure thread safety.
  */
-static void addCurrentRunningTask(void) {
+static void addCurrentRunningTask(uint8_t* avail_dep_tasks) {
 	if(xTasksDataMutex != NULL) {
 		if(xSemaphoreTake(xTasksDataMutex, portMAX_DELAY) == pdTRUE) {
 			current_running_tasks++;
+			*(avail_dep_tasks)-=1;
 			xSemaphoreGive(xTasksDataMutex);
 		}
 	}
@@ -204,10 +202,11 @@ static void addCurrentRunningTask(void) {
  * This function safely decrements the count of currently running tasks
  * using a semaphore to ensure thread safety.
  */
-static void removeCurrentRunningTask(void) {
+static void removeCurrentRunningTask(uint8_t* avail_dep_tasks) {
 	if(xTasksDataMutex != NULL) {
 		if(xSemaphoreTake(xTasksDataMutex, portMAX_DELAY) == pdTRUE) {
 			current_running_tasks--;
+			*(avail_dep_tasks)+=1;
 			xSemaphoreGive(xTasksDataMutex);
 		}
 	}

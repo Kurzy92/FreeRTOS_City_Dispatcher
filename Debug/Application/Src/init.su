@@ -1,0 +1,7 @@
+../Application/Src/init.c:13:6:initTasks	24	static
+../Application/Src/init.c:79:6:initQueues	8	static
+../Application/Src/init.c:108:6:initSemaphores	8	static
+../Application/Src/init.c:140:8:initAmbTasks	48	static,ignoring_inline_asm
+../Application/Src/init.c:179:8:initPolTasks	48	static,ignoring_inline_asm
+../Application/Src/init.c:218:8:initFireTasks	48	static,ignoring_inline_asm
+../Application/Src/init.c:256:8:initCoronaTasks	48	static,ignoring_inline_asm

@@ -110,12 +110,9 @@ void packetRouting(DispatcherPacket* new_packet) {
  * @param hDispPacket Pointer to the DispatcherPacket to be filled with generated data.
  */
 void generateDispatcherMSG(DispatcherPacket* hDispPacket) {
-	/*
-	 * TODO: Consider creating a Mutex for when trying to modify hDispPacket.
-	 * 		 It's also used in the TIM2 Interrupt Handler.
-	 */
 	DepartmentsEnum dep;
 	uint8_t msgIdx = 0;
+	uint16_t range = LONGEST_TASK_DURATION_IN_TICKS - SHORTEST_TASK_DURATION_IN_TICKS + 1;
 
 	// Generate Department
 	uint32_t random_number = 0;
@@ -124,7 +121,7 @@ void generateDispatcherMSG(DispatcherPacket* hDispPacket) {
 	        hDispPacket->department = dep;
 	}
 
-	// Pick a message
+	// Pick a message and set counter
 	switch(dep) {
 		case AMBULANCE:
 			if (HAL_RNG_GenerateRandomNumber(&hrng, &random_number) == HAL_OK) {
@@ -132,6 +129,7 @@ void generateDispatcherMSG(DispatcherPacket* hDispPacket) {
 			}
 			strncpy(hDispPacket->message, vAMBstrings[msgIdx], MAX_MSG_LENGTH - 1);
 			hDispPacket->message[MAX_MSG_LENGTH - 1] = '\0';
+			hDispPacket->available_tasks_counter = &available_amb_tasks;
 			break;
 
 
@@ -141,6 +139,7 @@ void generateDispatcherMSG(DispatcherPacket* hDispPacket) {
 			}
 			strncpy(hDispPacket->message, vPOLstrings[msgIdx], MAX_MSG_LENGTH - 1);
 			hDispPacket->message[MAX_MSG_LENGTH - 1] = '\0';
+			hDispPacket->available_tasks_counter = &available_police_tasks;
 			break;
 
 
@@ -150,6 +149,7 @@ void generateDispatcherMSG(DispatcherPacket* hDispPacket) {
 			}
 			strncpy(hDispPacket->message, vFIREstrings[msgIdx], MAX_MSG_LENGTH - 1);
 			hDispPacket->message[MAX_MSG_LENGTH - 1] = '\0';
+			hDispPacket->available_tasks_counter = &available_fire_tasks;
 			break;
 
 
@@ -159,6 +159,7 @@ void generateDispatcherMSG(DispatcherPacket* hDispPacket) {
 			}
 			strncpy(hDispPacket->message, vCORstrings[msgIdx], MAX_MSG_LENGTH - 1);
 			hDispPacket->message[MAX_MSG_LENGTH - 1] = '\0';
+			hDispPacket->available_tasks_counter = &available_corona_tasks;
 			break;
 
 
@@ -168,7 +169,7 @@ void generateDispatcherMSG(DispatcherPacket* hDispPacket) {
 
 	// Pick handling time
 	if (HAL_RNG_GenerateRandomNumber(&hrng, &random_number) == HAL_OK) {
-		hDispPacket->timeToHandleInTicks = (uint16_t)(random_number % LONGEST_TASK_DURATION_IN_TICKS) +
+		hDispPacket->timeToHandleInTicks = (uint16_t)(random_number % range) +
 													SHORTEST_TASK_DURATION_IN_TICKS;
 	}
 }

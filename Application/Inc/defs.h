@@ -13,6 +13,7 @@
 #include "queue.h"
 #include "semphr.h"
 #include "stdbool.h"
+#include "stm32f7xx_hal_gpio.h"
 
 // Tasks assigned resources
 #define AMBULANCE_TASKS 4
@@ -26,9 +27,10 @@
 #define TASKS_MEMORY_SIZE	500
 
 // Tasks priority defines
-#define HANDLE_TASKS_PRIORITY (configMAX_PRIORITIES - 10)
-#define MANAGER_TASK_PRIORITY HANDLE_TASKS_PRIORITY-3
-#define DISPATCHER_TASK_PRIORITY	MANAGER_TASK_PRIORITY + 1
+#define MANAGER_TASK_PRIORITY 		(configMAX_PRIORITIES - 10)
+#define HANDLE_TASKS_PRIORITY 		MANAGER_TASK_PRIORITY + 1
+#define DISPATCHER_TASK_PRIORITY	HANDLE_TASKS_PRIORITY + 1
+#define GET_DATA_TASK_PRIORITY 		DISPATCHER_TASK_PRIORITY + 1
 
 // Calls message config data
 #define MAX_NAME_LEN 12
@@ -43,8 +45,11 @@
 #define TIM2_PERIOD_SET		3999
 
 // Calls handling times
-#define SHORTEST_TASK_DURATION_IN_TICKS		pdMS_TO_TICKS(10000)
-#define LONGEST_TASK_DURATION_IN_TICKS		pdMS_TO_TICKS(20000)
+#define SHORTEST_TASK_DURATION_IN_TICKS		pdMS_TO_TICKS(1000)
+#define LONGEST_TASK_DURATION_IN_TICKS		pdMS_TO_TICKS(2000)
+
+// Data printing
+#define USER_DATA_PRINT_DELAY_IN_TICKS		pdMS_TO_TICKS(5000)
 
 // Get string from department enum
 #define GET_ENUM_DEPARTMENT_STR(x)	( \
@@ -72,6 +77,7 @@ typedef struct _DispatcherPacket {
 	DepartmentsEnum department;
 	char message[MAX_MSG_LENGTH];
 	uint16_t timeToHandleInTicks;
+	uint8_t* available_tasks_counter;
 } DispatcherPacket;
 
 typedef struct _taskInit_t {

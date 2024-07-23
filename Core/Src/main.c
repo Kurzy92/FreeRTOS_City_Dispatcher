@@ -51,6 +51,13 @@ UART_HandleTypeDef huart3;
 
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
+/* Definitions for defaultTask */
+osThreadId_t defaultTaskHandle;
+const osThreadAttr_t defaultTask_attributes = {
+  .name = "defaultTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
 /* USER CODE BEGIN PV */
 
 // QUEUE Handles
@@ -69,6 +76,7 @@ TaskHandle_t vCoronaTasks[CORONA_TASKS];
 TaskHandle_t vDispatcherTask;
 TaskHandle_t vInitTaskHandle;
 TaskHandle_t vTasksManagerTask;
+TaskHandle_t vGetDataTask;
 
 // TASKS Status Arrays and their
 bool bAmbTasksStatus[AMBULANCE_TASKS] = {false};
@@ -89,8 +97,17 @@ uint32_t total_tasks_ran = 0;
 float average_task_time = 0.0f;
 int8_t current_running_tasks = 0;
 
+// Currently available department tasks
+uint8_t available_amb_tasks = AMBULANCE_TASKS;
+uint8_t available_police_tasks = POLICE_TASKS;
+uint8_t available_fire_tasks = FIRE_TASKS;
+uint8_t available_corona_tasks = CORONA_TASKS;
+
 SemaphoreHandle_t xTasksDataMutex;
 
+TickType_t btnTickStart;
+TickType_t btnTickEnd;
+bool btnFlag = false;
 
 
 
@@ -103,6 +120,7 @@ static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_RNG_Init(void);
 static void MX_TIM2_Init(void);
+void StartDefaultTask(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -154,14 +172,37 @@ int main(void)
 
   /* USER CODE END 2 */
 
-  initSemaphores();
-  initQueues();
+  /* Init scheduler */
+  osKernelInitialize();
+
+  /* USER CODE BEGIN RTOS_MUTEX */
+  /* add mutexes, ... */
+  /* USER CODE END RTOS_MUTEX */
+
+  /* USER CODE BEGIN RTOS_SEMAPHORES */
+  /* add semaphores, ... */
+  /* USER CODE END RTOS_SEMAPHORES */
+
+  /* USER CODE BEGIN RTOS_TIMERS */
+  /* start timers, add new ones, ... */
+  /* USER CODE END RTOS_TIMERS */
+
+  /* USER CODE BEGIN RTOS_QUEUES */
+  /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
   /* creation of defaultTask */
+  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
+  initQueues();
+  initSemaphores();
+//  xDebounceTimer = xTimerCreate("DebounceTimer",
+//		  	  	  	  	  	  	 pdMS_TO_TICKS(50),
+//								 pdFALSE,
+//								 (void*)0,
+//								 DebounceTimerCallback);
   BaseType_t status;
   status = xTaskCreate((TaskFunction_t)initTasks,
 		  "init_task",
@@ -182,6 +223,7 @@ int main(void)
   /* USER CODE END RTOS_EVENTS */
 
   /* Start scheduler */
+  osKernelStart();
 
   /* We should never get here as control is now taken by the scheduler */
 
@@ -416,7 +458,7 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin : USER_Btn_Pin */
   GPIO_InitStruct.Pin = USER_Btn_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(USER_Btn_GPIO_Port, &GPIO_InitStruct);
 
@@ -472,281 +514,67 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
   HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
 
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
-void initTasks(void) {
-	/* TODO: consider creating a dedicated function to initialize the tasks,
-	 *       the function will receive the address of the tasks array, and its size,
-	 *       and will initialize it.
-	 *       This will replace initializing each array separately.
-	 */
-	if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
-		portENTER_CRITICAL();
-		printf("Starting initTasks task! \r\n");
-		fflush(stdout);
-		xSemaphoreGive(printfMutex);
-		portEXIT_CRITICAL();
-	}
-	/* AMBULANCE TASK INIT */
-	for(int i=0; i<AMBULANCE_TASKS; i++) {
-		taskInit_t* ambulance_taskInit = (taskInit_t*)pvPortMalloc(sizeof(taskInit_t));
-		configASSERT(ambulance_taskInit != NULL);
 
-		ambulance_taskInit->department = AMBULANCE;
-		ambulance_taskInit->taskIdentifier = i;
-		ambulance_taskInit->pQhandler = &qAmbulance;
-		ambulance_taskInit->pSemHandler = &AmbTasksStatusMutex;
-		ambulance_taskInit->bTaskStatusArr = bAmbTasksStatus;
-		ambulance_taskInit->numOfTasks = AMBULANCE_TASKS;
-
-		BaseType_t status;
-		char taskName[configMAX_TASK_NAME_LEN];
-		snprintf(taskName, configMAX_TASK_NAME_LEN, "Ambulance_%d", i);
-	 	status = xTaskCreate((TaskFunction_t)vHandleCall,
-	 							taskName,
-								TASKS_MEMORY_SIZE,
-								(void*)ambulance_taskInit,
-								HANDLE_TASKS_PRIORITY,
-								&vAmbulanceTasks[i]);
-	 	if(status != pdTRUE) {
-	 		/* TODO: handle this error */
-	 		vPortFree(ambulance_taskInit);
-	 		printf("Starting Ambulance Threads Failed! \r\n");
-	 		fflush(stdout);
-	 		return;
-	 	}
-	}
-	if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
-		portENTER_CRITICAL();
-		printf("Started Ambulance Threads! \r\n");
-		fflush(stdout);
-		xSemaphoreGive(printfMutex);
-		portEXIT_CRITICAL();
-	}
-
-
-	/* POLICE TASK INIT */
-	for(int i=0; i<POLICE_TASKS; i++) {
-		taskInit_t* police_taskInit = (taskInit_t*)pvPortMalloc(sizeof(taskInit_t));
-		configASSERT(police_taskInit != NULL);
-
-		police_taskInit->department = POLICE;
-		police_taskInit->taskIdentifier = i;
-		police_taskInit->pQhandler = &qPolice;
-		police_taskInit->pSemHandler = &PolTasksStatusMutex;
-		police_taskInit->bTaskStatusArr = bPolTasksStatus;
-		police_taskInit->numOfTasks = POLICE_TASKS;
-
-		BaseType_t status;
-		char taskName[configMAX_TASK_NAME_LEN];
-		snprintf(taskName, configMAX_TASK_NAME_LEN, "Police_%d", i);
-	 	status = xTaskCreate((TaskFunction_t)vHandleCall,
-	 							taskName,
-								TASKS_MEMORY_SIZE,
-								(void*) police_taskInit,
-								HANDLE_TASKS_PRIORITY,
-								&vPoliceTasks[i]);
-	 	if(status != pdTRUE) {
-	 		/* TODO: handle this error */
-	 		return;
-	 	}
-	}
-	if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
-		portENTER_CRITICAL();
-		printf("Started Police Threads! \r\n");
-		fflush(stdout);
-		xSemaphoreGive(printfMutex);
-		portEXIT_CRITICAL();
-	}
-
-	/* FIRE DEP TASK INIT */
-	for(int i=0; i<FIRE_TASKS; i++) {
-		taskInit_t* fire_taskInit = (taskInit_t*)pvPortMalloc(sizeof(taskInit_t));
-		configASSERT(fire_taskInit != NULL);
-
-		fire_taskInit->department = FIRE;
-		fire_taskInit->taskIdentifier = i;
-		fire_taskInit->pQhandler = &qFire;
-		fire_taskInit->pSemHandler = &FireTasksStatusMutex;
-		fire_taskInit->bTaskStatusArr = bFireTasksStatus;
-		fire_taskInit->numOfTasks = FIRE_TASKS;
-		BaseType_t status;
-		char taskName[configMAX_TASK_NAME_LEN];
-		snprintf(taskName, configMAX_TASK_NAME_LEN, "Fire_%d", i);
-	 	status = xTaskCreate((TaskFunction_t)vHandleCall,
-	 							taskName,
-								TASKS_MEMORY_SIZE,
-								(void*) fire_taskInit,
-								HANDLE_TASKS_PRIORITY,
-								&vFireTasks[i]);
-	 	if(status != pdTRUE) {
-	 		/* TODO: handle this error */
-	 		return;
-	 	}
-	}
-	if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
-		printf("Started Fire Dep Threads! \r\n");
-		fflush(stdout);
-		xSemaphoreGive(printfMutex);
-	}
-
-	/* CORONA TASK INIT */
-	for(int i=0; i<CORONA_TASKS; i++) {
-		taskInit_t* corona_taskInit = (taskInit_t*)pvPortMalloc(sizeof(taskInit_t));
-		configASSERT(corona_taskInit != NULL);
-
-		corona_taskInit->department = CORONA;
-		corona_taskInit->taskIdentifier = i;
-		corona_taskInit->pQhandler = &qCorona;
-		corona_taskInit->pSemHandler = &CorTasksStatusMutex;
-		corona_taskInit->bTaskStatusArr = bCorTasksStatus;
-		corona_taskInit->numOfTasks = CORONA_TASKS;
-
-		BaseType_t status;
-		char taskName[configMAX_TASK_NAME_LEN];
-		snprintf(taskName, configMAX_TASK_NAME_LEN, "Corona_%d", i);
-	 	status = xTaskCreate((TaskFunction_t)vHandleCall,
-	 							taskName,
-								TASKS_MEMORY_SIZE,
-								(void*) corona_taskInit,
-								HANDLE_TASKS_PRIORITY,
-								&vCoronaTasks[i]);
-	 	if(status != pdTRUE) {
-	 		/* TODO: handle this error */
-	 		return;
-	 	}
-	}
-	if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
-		printf("Started Corona Threads! \r\n");
-		fflush(stdout);
-		xSemaphoreGive(printfMutex);
-	}
-
-	vTaskDelay(100);
-
-	BaseType_t status = xTaskCreate((TaskFunction_t)vDispatcherCode,
-							"Dispatcher_Task",
-							TASKS_MEMORY_SIZE,
-							(void*)1,
-							DISPATCHER_TASK_PRIORITY,
-							&vDispatcherTask);
-	if(status != pdTRUE) {
-		return;
-	}
-	if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
-		printf("Started Dispatcher Thread! \r\n");
-		fflush(stdout);
-		xSemaphoreGive(printfMutex);
-	}
-
-	status = xTaskCreate((TaskFunction_t)tasksManagerTask,
-						"tasks_manager",
-						TASKS_MEMORY_SIZE,
-						(void*)1,
-						MANAGER_TASK_PRIORITY,
-						&vTasksManagerTask);
-
-
-	if(HAL_TIM_Base_Start_IT(&htim2) != HAL_OK) {
-		Error_Handler();
-	}
-	if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
-		printf("Timer interrupts enabled! \r\n");
-		fflush(stdout);
-		xSemaphoreGive(printfMutex);
-	}
-
-	//vTaskDelay(100);
-	//if(HAL_RNG_GenerateRandomNumber_IT(&hrng) != HAL_OK) {
-	//	Error_Handler();
-	//}
-	//vTaskDelay(100);
-	for(;;) {
-		uint32_t ulNotificationValue;
-		xTaskNotifyWait(0x00, 0x00, &ulNotificationValue, portMAX_DELAY);
-	}
+/**
+ * @brief Timer callback function for debouncing.
+ * @param xTimer: Timer handle
+ */
+void DebounceTimerCallback(TimerHandle_t xTimer) {
+    // Check the pin state after debounce period
+    if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == GPIO_PIN_SET) {
+        // Notify the task if the button is still pressed
+        xTaskNotify(vGetDataTask, 0x00, eNoAction);
+    }
 }
 
-void initQueues(void) {
-	/* TODO: Consider setting attributed for each queue */
-
-	qAmbulance = xQueueCreate(TASKS_QUEUE_SIZE, sizeof(DispatcherPacket));
-	if(qAmbulance == NULL) {
-		/* TODO: handle this error */
-		return;
-	}
-	qPolice = xQueueCreate(TASKS_QUEUE_SIZE, sizeof(DispatcherPacket));
-	if(qPolice == NULL) {
-		/* TODO: handle this error */
-		return;
-	}
-	qFire = xQueueCreate(TASKS_QUEUE_SIZE, sizeof(DispatcherPacket));
-	if(qFire == NULL) {
-		/* TODO: handle this error */
-		return;
-	}
-	qCorona = xQueueCreate(TASKS_QUEUE_SIZE, sizeof(DispatcherPacket));
-	if(qCorona == NULL) {
-		/* TODO: handle this error */
-		return;
-	}
-	qDispatcher = xQueueCreate(TASKS_QUEUE_SIZE, sizeof(DispatcherPacket));
-	if(qDispatcher == NULL) {
-		/* TODO: handle this error */
-		return;
-	}
-	/* TODO: log a message queues were initialized */
-
-}
-
-
-
-
-
-void initSemaphores(void) {
-	printfMutex = xSemaphoreCreateMutex();
-	if(printfMutex == NULL) {
-		return;
-	}
-	xTasksDataMutex = xSemaphoreCreateMutex();
-	if(printfMutex == NULL) {
-		return;
-	}
-	AmbTasksStatusMutex = xSemaphoreCreateMutex();
-	if(printfMutex == NULL) {
-		return;
-	}
-	PolTasksStatusMutex = xSemaphoreCreateMutex();
-	if(printfMutex == NULL) {
-		return;
-	}
-	FireTasksStatusMutex = xSemaphoreCreateMutex();
-	if(printfMutex == NULL) {
-		return;
-	}
-	CorTasksStatusMutex = xSemaphoreCreateMutex();
-	if(printfMutex == NULL) {
-		return;
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+	if(GPIO_Pin == GPIO_PIN_13) {
+		if(HAL_GPIO_ReadPin(USER_Btn_GPIO_Port, USER_Btn_Pin) == GPIO_PIN_SET){
+			btnTickStart = xTaskGetTickCountFromISR();
+		} else {
+			if(btnTickStart != 0) {
+				btnTickEnd = xTaskGetTickCountFromISR();
+				if(btnTickEnd - btnTickStart > 50) {
+					BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+					btnFlag = !btnFlag;
+					xTaskNotifyFromISR(vGetDataTask, 0x00, eNoAction,
+							&xHigherPriorityTaskWoken);
+					if(xHigherPriorityTaskWoken == pdTRUE)
+								portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+				}
+			}
+			btnTickStart = btnTickEnd = 0;
+		}
 	}
 }
-
-
-//void HAL_RNG_ReadyDataCallback(RNG_HandleTypeDef *hrng, uint32_t random32bit)
-//{
-//  uint32_t randomPeriod = (random32bit % MAX_TIM2_IT_PERIOD) + MIN_TIM2_IT_PERIOD;
-//
-//  // Update timer IT period
-//  __HAL_TIM_SET_AUTORELOAD(&htim2, randomPeriod * 2);
-//  __HAL_TIM_SET_COUNTER(&htim2, 0);
-//
-//  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
-//
-//}
 /* USER CODE END 4 */
 
+/* USER CODE BEGIN Header_StartDefaultTask */
+/**
+  * @brief  Function implementing the defaultTask thread.
+  * @param  argument: Not used
+  * @retval None
+  */
+/* USER CODE END Header_StartDefaultTask */
+void StartDefaultTask(void *argument)
+{
+  /* USER CODE BEGIN 5 */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END 5 */
+}
 
 /**
   * @brief  Period elapsed callback in non blocking mode
@@ -775,10 +603,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		}
 		if(xHigherPriorityTaskWoken == pdTRUE)
 			portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-
-		/*
-		 * TODO: add a random item to dispatcher queue.
-		 */
 	}
   /* USER CODE END Callback 0 */
   if (htim->Instance == TIM6) {
@@ -800,6 +624,8 @@ void Error_Handler(void)
   __disable_irq();
   while (1)
   {
+	  vTaskEndScheduler();
+	  return;
   }
   /* USER CODE END Error_Handler_Debug */
 }
