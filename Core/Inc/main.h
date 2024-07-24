@@ -73,6 +73,7 @@ extern TaskHandle_t vGetDataTask;
 
 extern RNG_HandleTypeDef hrng;
 extern TIM_HandleTypeDef htim2;
+extern UART_HandleTypeDef huart2;
 
 
 extern SemaphoreHandle_t xTasksDataMutex;

@@ -16,21 +16,22 @@
 #include "stm32f7xx_hal_gpio.h"
 
 // Tasks assigned resources
-#define AMBULANCE_TASKS 4
-#define POLICE_TASKS 3
-#define FIRE_TASKS 2
-#define CORONA_TASKS 4
-#define MAX_TOTAL_CONCURRENT_TASKS 10
+#define AMBULANCE_TASKS 8
+#define POLICE_TASKS 5
+#define FIRE_TASKS 5
+#define CORONA_TASKS 5
+#define MAX_TOTAL_CONCURRENT_TASKS 20
 
 // Queue init configuration data
 #define TASKS_QUEUE_SIZE 10
 #define TASKS_MEMORY_SIZE	500
 
 // Tasks priority defines
-#define MANAGER_TASK_PRIORITY 		(configMAX_PRIORITIES - 10)
+#define MANAGER_TASK_PRIORITY 		(configMAX_PRIORITIES - 15)
 #define HANDLE_TASKS_PRIORITY 		MANAGER_TASK_PRIORITY + 1
 #define DISPATCHER_TASK_PRIORITY	HANDLE_TASKS_PRIORITY + 1
 #define GET_DATA_TASK_PRIORITY 		DISPATCHER_TASK_PRIORITY + 1
+#define LOGGER_TASK_PRIORITY 		GET_DATA_TASK_PRIORITY + 1
 
 // Calls message config data
 #define MAX_NAME_LEN 12
@@ -59,6 +60,12 @@
 						(x)==CORONA? "Corona"  : \
 						"unknown dep" \
 						)
+
+// Logger Defines
+#define LOGGER_UART			1
+#define LOGGER_QUEUE_SIZE	25
+#define LOGGER_HUART		huart2
+
 
 typedef enum  {
 	AMBULANCE = 0,

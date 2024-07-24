@@ -47,17 +47,13 @@ RNG_HandleTypeDef hrng;
 
 TIM_HandleTypeDef htim2;
 
+UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
 
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
 /* Definitions for defaultTask */
-osThreadId_t defaultTaskHandle;
-const osThreadAttr_t defaultTask_attributes = {
-  .name = "defaultTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
-};
+
 /* USER CODE BEGIN PV */
 
 // QUEUE Handles
@@ -77,6 +73,7 @@ TaskHandle_t vDispatcherTask;
 TaskHandle_t vInitTaskHandle;
 TaskHandle_t vTasksManagerTask;
 TaskHandle_t vGetDataTask;
+TaskHandle_t vLoggerTask;
 
 // TASKS Status Arrays and their
 bool bAmbTasksStatus[AMBULANCE_TASKS] = {false};
@@ -107,7 +104,18 @@ SemaphoreHandle_t xTasksDataMutex;
 
 TickType_t btnTickStart;
 TickType_t btnTickEnd;
+
+
+/*
+ * btnFlagState:
+ * value 0 - not in data print state
+ * value 1 - in data print state.
+ */
+uint8_t btnFlagState = 0;
 bool btnFlag = false;
+TimerHandle_t xDebounceTimer;
+bool btnTimerUsed = false;
+
 
 
 
@@ -120,6 +128,7 @@ static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_RNG_Init(void);
 static void MX_TIM2_Init(void);
+static void MX_USART2_UART_Init(void);
 void StartDefaultTask(void *argument);
 
 /* USER CODE BEGIN PFP */
@@ -168,12 +177,13 @@ int main(void)
   MX_USB_OTG_FS_PCD_Init();
   MX_RNG_Init();
   MX_TIM2_Init();
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
 
   /* Init scheduler */
-  osKernelInitialize();
+
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -193,16 +203,16 @@ int main(void)
 
   /* Create the thread(s) */
   /* creation of defaultTask */
-  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+
 
   /* USER CODE BEGIN RTOS_THREADS */
   initQueues();
   initSemaphores();
-//  xDebounceTimer = xTimerCreate("DebounceTimer",
-//		  	  	  	  	  	  	 pdMS_TO_TICKS(50),
-//								 pdFALSE,
-//								 (void*)0,
-//								 DebounceTimerCallback);
+  xDebounceTimer = xTimerCreate("DebounceTimer",
+		  	  	  	  	  	  	 pdMS_TO_TICKS(50),
+								 pdFALSE,
+								 (void*)0,
+								 DebounceTimerCallback);
   BaseType_t status;
   status = xTaskCreate((TaskFunction_t)initTasks,
 		  "init_task",
@@ -223,7 +233,7 @@ int main(void)
   /* USER CODE END RTOS_EVENTS */
 
   /* Start scheduler */
-  osKernelStart();
+
 
   /* We should never get here as control is now taken by the scheduler */
 
@@ -335,9 +345,9 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = TIM2_PRESCALER_SET;
+  htim2.Init.Prescaler = 539;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = TIM2_PERIOD_SET;
+  htim2.Init.Period = 4294967295;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -358,6 +368,41 @@ static void MX_TIM2_Init(void)
   /* USER CODE BEGIN TIM2_Init 2 */
 
   /* USER CODE END TIM2_Init 2 */
+
+}
+
+/**
+  * @brief USART2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART2_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART2_Init 0 */
+
+  /* USER CODE END USART2_Init 0 */
+
+  /* USER CODE BEGIN USART2_Init 1 */
+
+  /* USER CODE END USART2_Init 1 */
+  huart2.Instance = USART2;
+  huart2.Init.BaudRate = 115200;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.Parity = UART_PARITY_NONE;
+  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart2.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART2_Init 2 */
+
+  /* USER CODE END USART2_Init 2 */
 
 }
 
@@ -532,27 +577,31 @@ void DebounceTimerCallback(TimerHandle_t xTimer) {
     // Check the pin state after debounce period
     if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == GPIO_PIN_SET) {
         // Notify the task if the button is still pressed
-        xTaskNotify(vGetDataTask, 0x00, eNoAction);
+    	if(btnFlag) {
+    		vTaskResume(vTasksManagerTask);
+    	}
+    	btnFlag = !btnFlag;
+    	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    	xTaskNotifyFromISR(vGetDataTask, 0x00, eNoAction, &xHigherPriorityTaskWoken);
+    	 if (xHigherPriorityTaskWoken == pdTRUE) {
+    		 portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+    	 }
     }
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	if(GPIO_Pin == GPIO_PIN_13) {
-		if(HAL_GPIO_ReadPin(USER_Btn_GPIO_Port, USER_Btn_Pin) == GPIO_PIN_SET){
-			btnTickStart = xTaskGetTickCountFromISR();
-		} else {
-			if(btnTickStart != 0) {
-				btnTickEnd = xTaskGetTickCountFromISR();
-				if(btnTickEnd - btnTickStart > 50) {
-					BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-					btnFlag = !btnFlag;
-					xTaskNotifyFromISR(vGetDataTask, 0x00, eNoAction,
-							&xHigherPriorityTaskWoken);
-					if(xHigherPriorityTaskWoken == pdTRUE)
-								portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+		if(HAL_GPIO_ReadPin(USER_Btn_GPIO_Port, USER_Btn_Pin) == GPIO_PIN_SET) {
+			if(!btnTimerUsed) {
+				btnTimerUsed = !btnTimerUsed;
+				if(xTimerStartFromISR(xDebounceTimer, 0)!=pdPASS) {
+					error_handling("Couldn't start button timer\r\n");
+				}
+			} else {
+				if(xTimerResetFromISR(xDebounceTimer, 0)!=pdPASS) {
+					error_handling("Couldn't start button timer\r\n");
 				}
 			}
-			btnTickStart = btnTickEnd = 0;
 		}
 	}
 }

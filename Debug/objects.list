@@ -2,6 +2,7 @@
 "./Application/Src/dispatcher.o"
 "./Application/Src/error_handling.o"
 "./Application/Src/init.o"
+"./Application/Src/logger.o"
 "./Application/Src/task_handling.o"
 "./Core/Src/freertos.o"
 "./Core/Src/main.o"

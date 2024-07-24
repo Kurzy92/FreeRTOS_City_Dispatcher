@@ -15,17 +15,8 @@ void getTasksStatus(void) {
 			printedStatus = false;
 			xTaskNotifyWait(0x00, 0x00, &ulNotificationValue, portMAX_DELAY);
 		}
-		taskENTER_CRITICAL();
-		/* Current Running tasks
-		 * Total Ran Tasks
-		 * Total Time
-		 * Average task time
-		 * Ambulance tasks details
-		 * Police Tasks details
-		 * Fire Dep tasks details
-		 * Corona tasks details
-		 */
 		if(!printedStatus) {
+			vTaskSuspend(vTasksManagerTask);
 			printf("\n\n"
 					"************** Tasks Status Report **************\r\n"
 					"            Current Running tasks: %d\r\n"
@@ -70,10 +61,12 @@ void getTasksStatus(void) {
 					(int)available_corona_tasks);
 			fflush(stdout);
 			printedStatus = !printedStatus;
-			btnFlag = false;
-
-			//taskYIELD();
+			xTaskNotifyWait(0x00, 0x00, &ulNotificationValue, portMAX_DELAY);
+//			}
+//			xSemaphoreGive(printfMutex);
 		}
-		taskEXIT_CRITICAL();
+
 	}
 }
+
+

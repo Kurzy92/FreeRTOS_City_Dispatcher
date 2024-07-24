@@ -1,7 +1,7 @@
 ../Application/Src/init.c:13:6:initTasks	9
-../Application/Src/init.c:79:6:initQueues	6
-../Application/Src/init.c:108:6:initSemaphores	7
-../Application/Src/init.c:140:8:initAmbTasks	5
-../Application/Src/init.c:179:8:initPolTasks	5
-../Application/Src/init.c:218:8:initFireTasks	5
-../Application/Src/init.c:256:8:initCoronaTasks	5
+../Application/Src/init.c:79:6:initQueues	7
+../Application/Src/init.c:112:6:initSemaphores	7
+../Application/Src/init.c:144:8:initAmbTasks	5
+../Application/Src/init.c:183:8:initPolTasks	5
+../Application/Src/init.c:222:8:initFireTasks	5
+../Application/Src/init.c:260:8:initCoronaTasks	5

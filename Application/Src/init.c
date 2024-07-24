@@ -54,7 +54,7 @@ void initTasks(void) {
 	}
 	status = xTaskCreate((TaskFunction_t)getTasksStatus,
 						"get_data_task",
-						configMINIMAL_STACK_SIZE,
+						TASKS_MEMORY_SIZE,
 						(void*)1,
 						GET_DATA_TASK_PRIORITY,
 						&vGetDataTask);
@@ -96,6 +96,10 @@ void initQueues(void) {
 	qDispatcher = xQueueCreate(TASKS_QUEUE_SIZE, sizeof(DispatcherPacket));
 	if(qDispatcher == NULL) {
 		error_handling("Dispatcher queue creation failed!\r\n");
+	}
+	qLogger = xQueueCreate(LOGGER_QUEUE_SIZE, sizeof(char[MAX_MSG_LENGTH]));
+	if(qDispatcher == NULL) {
+		error_handling("Logger queue creation failed!\r\n");
 	}
 }
 

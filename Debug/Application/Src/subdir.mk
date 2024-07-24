@@ -9,6 +9,7 @@ C_SRCS += \
 ../Application/Src/dispatcher.c \
 ../Application/Src/error_handling.c \
 ../Application/Src/init.c \
+../Application/Src/logger.c \
 ../Application/Src/task_handling.c 
 
 OBJS += \
@@ -16,6 +17,7 @@ OBJS += \
 ./Application/Src/dispatcher.o \
 ./Application/Src/error_handling.o \
 ./Application/Src/init.o \
+./Application/Src/logger.o \
 ./Application/Src/task_handling.o 
 
 C_DEPS += \
@@ -23,6 +25,7 @@ C_DEPS += \
 ./Application/Src/dispatcher.d \
 ./Application/Src/error_handling.d \
 ./Application/Src/init.d \
+./Application/Src/logger.d \
 ./Application/Src/task_handling.d 
 
 
@@ -33,7 +36,7 @@ Application/Src/%.o Application/Src/%.su Application/Src/%.cyclo: ../Application
 clean: clean-Application-2f-Src
 
 clean-Application-2f-Src:
-	-$(RM) ./Application/Src/data.cyclo ./Application/Src/data.d ./Application/Src/data.o ./Application/Src/data.su ./Application/Src/dispatcher.cyclo ./Application/Src/dispatcher.d ./Application/Src/dispatcher.o ./Application/Src/dispatcher.su ./Application/Src/error_handling.cyclo ./Application/Src/error_handling.d ./Application/Src/error_handling.o ./Application/Src/error_handling.su ./Application/Src/init.cyclo ./Application/Src/init.d ./Application/Src/init.o ./Application/Src/init.su ./Application/Src/task_handling.cyclo ./Application/Src/task_handling.d ./Application/Src/task_handling.o ./Application/Src/task_handling.su
+	-$(RM) ./Application/Src/data.cyclo ./Application/Src/data.d ./Application/Src/data.o ./Application/Src/data.su ./Application/Src/dispatcher.cyclo ./Application/Src/dispatcher.d ./Application/Src/dispatcher.o ./Application/Src/dispatcher.su ./Application/Src/error_handling.cyclo ./Application/Src/error_handling.d ./Application/Src/error_handling.o ./Application/Src/error_handling.su ./Application/Src/init.cyclo ./Application/Src/init.d ./Application/Src/init.o ./Application/Src/init.su ./Application/Src/logger.cyclo ./Application/Src/logger.d ./Application/Src/logger.o ./Application/Src/logger.su ./Application/Src/task_handling.cyclo ./Application/Src/task_handling.d ./Application/Src/task_handling.o ./Application/Src/task_handling.su
 
 .PHONY: clean-Application-2f-Src
 
