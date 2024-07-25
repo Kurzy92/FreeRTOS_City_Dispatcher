@@ -30,7 +30,7 @@ char logInitBuffer2[MAX_MSG_LENGTH];
  * available tasks and the current running tasks are below the maximum allowed,
  * it assigns tasks to the appropriate handlers.
  */
-void tasksManagerTask(void) {
+void tasksManagerTask(void *pvParameters) {
 	uint32_t ulNotificationValue;
 	int8_t newTaskIndex;
 	for(;;) {

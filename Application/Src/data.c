@@ -6,8 +6,12 @@
  */
 #include "data.h"
 
-
-void getTasksStatus(void) {
+/**
+ * @brief Task to get and print the status of all tasks.
+ *
+ * @param pvParameters Parameters passed to the task (unused).
+ */
+void getTasksStatus(void *pvParameters) {
     uint32_t ulNotificationValue;
     bool printedStatus = false;
     char logBuffer[MAX_MSG_LENGTH];

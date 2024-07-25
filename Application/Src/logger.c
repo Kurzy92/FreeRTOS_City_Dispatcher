@@ -7,6 +7,14 @@
 
 #include "logger.h"
 
+/**
+ * @brief Task to print log messages.
+ *
+ * This task continuously receives messages from the log queue (`qLogger`)
+ * and transmits them over UART.
+ *
+ * @param pvParameters Parameters passed to the task (unused).
+ */
 void Logger_Print(void *pvParameters) {
     char msg[MAX_MSG_LENGTH];
 
@@ -24,6 +32,14 @@ void Logger_Print(void *pvParameters) {
 }
 
 
+/**
+ * @brief Sends a log message to the log queue.
+ *
+ * This function copies the provided message into a local buffer
+ * and sends it to the log queue (`qLogger`).
+ *
+ * @param message The message to log.
+ */
 void SendLogMessage(const char *message) {
     char logMessage[MAX_MSG_LENGTH];
 
@@ -36,6 +52,15 @@ void SendLogMessage(const char *message) {
     }
 }
 
+
+/**
+ * @brief Sends a data message to the button data queue.
+ *
+ * This function copies the provided message into a local buffer
+ * and sends it to the button data queue (`qBtnData`).
+ *
+ * @param message The message to send.
+ */
 void SendDataMessage(const char *message) {
     char dataMessage[MAX_MSG_LENGTH];
 
@@ -48,6 +73,16 @@ void SendDataMessage(const char *message) {
     }
 }
 
+
+/**
+ * @brief Task to print data messages.
+ *
+ * This task continuously checks the button data queue (`qBtnData`) for messages.
+ * If the queue is empty, it waits for a notification. When a message is received,
+ * it is transmitted over UART.
+ *
+ * @param pvParameters Parameters passed to the task (unused).
+ */
 void Data_Print(void *pvParameters) {
     char msg[MAX_MSG_LENGTH];
     uint32_t ulNotificationValue;

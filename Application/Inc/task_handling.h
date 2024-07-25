@@ -16,7 +16,7 @@
 #define TASK_MANAGER_TICKS_TO_WAIT  pdMS_TO_TICKS(40)
 
 void vHandleCall(void* pvParameters);
-void tasksManagerTask(void);
+void tasksManagerTask(void *pvParameters);
 
 
 #endif /* INC_TASK_HANDLING_H_ */

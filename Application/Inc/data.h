@@ -10,6 +10,6 @@
 
 #include "main.h"
 
-void getTasksStatus(void);
+void getTasksStatus(void *pvParameters);
 
 #endif /* INC_DATA_H_ */

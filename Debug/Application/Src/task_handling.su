@@ -1,4 +1,4 @@
-../Application/Src/task_handling.c:33:6:tasksManagerTask	16	static,ignoring_inline_asm
+../Application/Src/task_handling.c:33:6:tasksManagerTask	24	static,ignoring_inline_asm
 ../Application/Src/task_handling.c:111:6:vHandleCall	272	static
 ../Application/Src/task_handling.c:184:13:addCurrentRunningTask	16	static
 ../Application/Src/task_handling.c:201:13:removeCurrentRunningTask	16	static
