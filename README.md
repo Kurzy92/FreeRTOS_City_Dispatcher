@@ -1,10 +1,10 @@
-**City Dispatcher Project**
+**<h2>City Dispatcher Project</h2>**
 
 The City Dispatcher project is implemented on the STM32F746ZG-NUCLEO board.
 I created this project in order to gain some experience using the FreeRTOS OS
 and understand how its various features work and communicate with each other.
 
-**Project Description**
+**<h3>Project Description</h3>**
 
 The City Dispatcher project simulates the operation control room, responsible
 for the management of receiving emergency/urgnet calls and forwarding them to the 
@@ -12,7 +12,7 @@ relevant handler.
 The project utilizes the use of FreeRTOS's task management features, queues, inter-task communication methods,
 synchronization processes(mutexes/semaphores), timers, etc...
 
-**How It Works?**
+**<h3>How It Works?</h3>**
 
 Every handler type(Ambulances, Police, Fire Department, Corona treatments) have a limited amount of tasks attached to it.
 Each task can perform a single call at any given time. When a task has been handled, it will wait(in BLOCKED state) for
@@ -30,14 +30,15 @@ On each TIM2 interrupt, a random department is picked, along with call descripti
 limited pool of calls.
 
 
-**Program's Configuration**
+**<h3>Program's Configuration</h3>**
 
 Configuration of the program can be done in the /Application/Inc/defs.h file.
 Various configurations can be modified from there(such as min/max time for a task, number of tasks allocated for each department,
 maximum number of tasks that can be activated in parallel, tasks priorities, queue sizes)
 enums and structs are also included in defs.h.
 
-**Connecting Through UART**
+**<h3>Connecting Through UART</h3>**
+
 UART connection is done at a baud rate of 115200 bits/s, and through the board's COM# connection.
 
 Pressing the USER button will display details regarding the program's operation:
