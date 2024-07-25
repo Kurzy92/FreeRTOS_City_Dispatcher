@@ -59,11 +59,9 @@ void vDispatcherCode(void *pvParameters) {
 	uint32_t ulNotificationValue;
 	for(;;) {
 		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, GPIO_PIN_SET);
-		//printf("Dispatcher Entered BLOCKED state! \r\n");
-		//fflush(stdout);
+
 		xTaskNotifyWait(0x00, 0x00, &ulNotificationValue, portMAX_DELAY);
-		//printf("Dispatcher in RUNNING state! \n \tPerforming a task! \r\n");
-		//fflush(stdout);
+
 		DispatcherPacket new_packet;
 		if( xQueueReceive(qDispatcher, &new_packet, portMAX_DELAY) == pdPASS) {
 			packetRouting(&new_packet);

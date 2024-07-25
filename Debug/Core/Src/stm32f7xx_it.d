@@ -56,6 +56,7 @@ Core/Src/stm32f7xx_it.o: ../Core/Src/stm32f7xx_it.c ../Core/Inc/main.h \
  D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/error_handling.h \
  D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/init.h \
  D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/data.h \
+ D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/logger.h \
  ../Core/Inc/stm32f7xx_it.h
 ../Core/Inc/main.h:
 ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal.h:
@@ -115,4 +116,5 @@ D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/task_h
 D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/error_handling.h:
 D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/init.h:
 D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/data.h:
+D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/logger.h:
 ../Core/Inc/stm32f7xx_it.h:

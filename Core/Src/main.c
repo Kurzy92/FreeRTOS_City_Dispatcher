@@ -47,13 +47,17 @@ RNG_HandleTypeDef hrng;
 
 TIM_HandleTypeDef htim2;
 
-UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
 
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
 /* Definitions for defaultTask */
-
+osThreadId_t defaultTaskHandle;
+const osThreadAttr_t defaultTask_attributes = {
+  .name = "defaultTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
 /* USER CODE BEGIN PV */
 
 // QUEUE Handles
@@ -63,6 +67,7 @@ QueueHandle_t qFire;
 QueueHandle_t qCorona;
 QueueHandle_t qDispatcher;
 QueueHandle_t qLogger;
+QueueHandle_t qBtnData;
 
 // TASKS Handles
 TaskHandle_t vAmbulanceTasks[AMBULANCE_TASKS];
@@ -74,6 +79,7 @@ TaskHandle_t vInitTaskHandle;
 TaskHandle_t vTasksManagerTask;
 TaskHandle_t vGetDataTask;
 TaskHandle_t vLoggerTask;
+TaskHandle_t vBtnDataTask;
 
 // TASKS Status Arrays and their
 bool bAmbTasksStatus[AMBULANCE_TASKS] = {false};
@@ -128,7 +134,6 @@ static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_RNG_Init(void);
 static void MX_TIM2_Init(void);
-static void MX_USART2_UART_Init(void);
 void StartDefaultTask(void *argument);
 
 /* USER CODE BEGIN PFP */
@@ -177,13 +182,11 @@ int main(void)
   MX_USB_OTG_FS_PCD_Init();
   MX_RNG_Init();
   MX_TIM2_Init();
-  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
 
   /* Init scheduler */
-
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -204,7 +207,6 @@ int main(void)
   /* Create the thread(s) */
   /* creation of defaultTask */
 
-
   /* USER CODE BEGIN RTOS_THREADS */
   initQueues();
   initSemaphores();
@@ -221,6 +223,24 @@ int main(void)
 		  configMAX_PRIORITIES,
 		  &vInitTaskHandle);
   configASSERT(status ==  pdTRUE);
+
+  status = xTaskCreate((TaskFunction_t)Logger_Print,
+		  "Logger",
+		  TASKS_MEMORY_SIZE,
+		  (void*) 1,
+		  LOGGER_TASK_PRIORITY,
+		  &vLoggerTask);
+  configASSERT(status ==  pdTRUE);
+
+  status = xTaskCreate((TaskFunction_t)Data_Print,
+		  "Print Data",
+		  TASKS_MEMORY_SIZE,
+		  (void*) 1,
+		  LOGGER_TASK_PRIORITY,
+		  &vBtnDataTask);
+  configASSERT(status ==  pdTRUE);
+
+
   /* add threads, ... */
 
   /* USER CODE END RTOS_THREADS */
@@ -233,7 +253,6 @@ int main(void)
   /* USER CODE END RTOS_EVENTS */
 
   /* Start scheduler */
-
 
   /* We should never get here as control is now taken by the scheduler */
 
@@ -345,9 +364,9 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 539;
+  htim2.Init.Prescaler = TIM2_PRESCALER_SET;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 4294967295;
+  htim2.Init.Period = TIM2_PERIOD_SET;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -368,41 +387,6 @@ static void MX_TIM2_Init(void)
   /* USER CODE BEGIN TIM2_Init 2 */
 
   /* USER CODE END TIM2_Init 2 */
-
-}
-
-/**
-  * @brief USART2 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_USART2_UART_Init(void)
-{
-
-  /* USER CODE BEGIN USART2_Init 0 */
-
-  /* USER CODE END USART2_Init 0 */
-
-  /* USER CODE BEGIN USART2_Init 1 */
-
-  /* USER CODE END USART2_Init 1 */
-  huart2.Instance = USART2;
-  huart2.Init.BaudRate = 115200;
-  huart2.Init.WordLength = UART_WORDLENGTH_8B;
-  huart2.Init.StopBits = UART_STOPBITS_1;
-  huart2.Init.Parity = UART_PARITY_NONE;
-  huart2.Init.Mode = UART_MODE_TX_RX;
-  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
-  huart2.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-  huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-  if (HAL_UART_Init(&huart2) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN USART2_Init 2 */
-
-  /* USER CODE END USART2_Init 2 */
 
 }
 
@@ -579,6 +563,7 @@ void DebounceTimerCallback(TimerHandle_t xTimer) {
         // Notify the task if the button is still pressed
     	if(btnFlag) {
     		vTaskResume(vTasksManagerTask);
+    		vTaskResume(vLoggerTask);
     	}
     	btnFlag = !btnFlag;
     	BaseType_t xHigherPriorityTaskWoken = pdFALSE;

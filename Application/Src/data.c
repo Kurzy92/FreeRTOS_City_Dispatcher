@@ -8,65 +8,88 @@
 
 
 void getTasksStatus(void) {
-	uint32_t ulNotificationValue;
-	bool printedStatus = false;
-	for(;;) {
-		if(!btnFlag) {
-			printedStatus = false;
-			xTaskNotifyWait(0x00, 0x00, &ulNotificationValue, portMAX_DELAY);
-		}
-		if(!printedStatus) {
-			vTaskSuspend(vTasksManagerTask);
-			printf("\n\n"
-					"************** Tasks Status Report **************\r\n"
-					"            Current Running tasks: %d\r\n"
-					"              Total Ran Tasks: %d\r\n"
-					"          Total tasks running time: %.3f\r\n"
-					"          Average task running time: %.3f\r\n",
-					(int)current_running_tasks,
-					(int)total_tasks_ran,
-					total_tasks_time,
-					average_task_time);
-			fflush(stdout);
-			printf("********* Ambulances Tasks Status Report *********\n"
-					"              Total ambulance tasks: %d\r\n"
-					"              Current occupied tasks: %d\r\n"
-					"              current available tasks: %d\r\n",
-					(int)AMBULANCE_TASKS,
-					(int)(AMBULANCE_TASKS - available_amb_tasks),
-					(int)available_amb_tasks);
-			fflush(stdout);
-			printf("*********** Police Tasks Status Report ***********\n"
-					"             Total police tasks: %d\r\n"
-					"             Current occupied tasks: %d\r\n"
-					"             current available tasks: %d\r\n",
-					(int)POLICE_TASKS,
-					(int)(POLICE_TASKS - available_police_tasks),
-					(int)available_police_tasks);
-			fflush(stdout);
-			printf("********** Fire Dep Tasks Status Report **********\n"
-					"              Total fire dep tasks: %d\r\n"
-					"              Current occupied tasks: %d\r\n"
-					"              current available tasks: %d\r\n",
-					(int)FIRE_TASKS,
-					(int)(FIRE_TASKS - available_fire_tasks),
-					(int)available_fire_tasks);
-			fflush(stdout);
-			printf("*********** Corona Tasks Status Report ************\n"
-					"              Total corona tasks: %d\r\n"
-					"              Current occupied tasks: %d\r\n"
-					"              current available tasks: %d\r\n\n\n",
-					(int)CORONA_TASKS,
-					(int)(CORONA_TASKS - available_corona_tasks),
-					(int)available_corona_tasks);
-			fflush(stdout);
-			printedStatus = !printedStatus;
-			xTaskNotifyWait(0x00, 0x00, &ulNotificationValue, portMAX_DELAY);
-//			}
-//			xSemaphoreGive(printfMutex);
-		}
+    uint32_t ulNotificationValue;
+    bool printedStatus = false;
+    char logBuffer[MAX_MSG_LENGTH];
 
-	}
+    for (;;) {
+        if (!btnFlag) {
+            printedStatus = false;
+            xTaskNotifyWait(0x00, 0x00, &ulNotificationValue, portMAX_DELAY);
+        }
+        if (!printedStatus) {
+            taskENTER_CRITICAL();
+            vTaskSuspend(vTasksManagerTask);
+            vTaskSuspend(vLoggerTask);
+
+
+            snprintf(logBuffer, MAX_MSG_LENGTH, "\n\n************** Tasks Status Report **************\r\n");
+            SendDataMessage(logBuffer);
+
+            snprintf(logBuffer, MAX_MSG_LENGTH, "           Current Running tasks: %d\r\n", (int)current_running_tasks);
+            SendDataMessage(logBuffer);
+
+            snprintf(logBuffer, MAX_MSG_LENGTH, "              Total Ran Tasks: %d\r\n", (int)total_tasks_ran);
+            SendDataMessage(logBuffer);
+
+            snprintf(logBuffer, MAX_MSG_LENGTH, "     Total tasks running time: %.3f seconds\r\n", total_tasks_time);
+            SendDataMessage(logBuffer);
+
+            snprintf(logBuffer, MAX_MSG_LENGTH, "     Average task running time: %.3f seconds\r\n", average_task_time);
+            SendDataMessage(logBuffer);
+
+            snprintf(logBuffer, MAX_MSG_LENGTH, "\n********* Ambulances Tasks Status Report *********\r\n");
+            SendDataMessage(logBuffer);
+
+            snprintf(logBuffer, MAX_MSG_LENGTH, "           Total ambulance tasks: %d\r\n", (int)AMBULANCE_TASKS);
+            SendDataMessage(logBuffer);
+
+            snprintf(logBuffer, MAX_MSG_LENGTH, "           Current occupied tasks: %d\r\n", (int)(AMBULANCE_TASKS - available_amb_tasks));
+            SendDataMessage(logBuffer);
+
+            snprintf(logBuffer, MAX_MSG_LENGTH, "           Current available tasks: %d\r\n", (int)available_amb_tasks);
+            SendDataMessage(logBuffer);
+
+            snprintf(logBuffer, MAX_MSG_LENGTH, "\n*********** Police Tasks Status Report ***********\r\n");
+            SendDataMessage(logBuffer);
+
+            snprintf(logBuffer, MAX_MSG_LENGTH, "           Total police tasks: %d\r\n", (int)POLICE_TASKS);
+            SendDataMessage(logBuffer);
+
+            snprintf(logBuffer, MAX_MSG_LENGTH, "           Current occupied tasks: %d\r\n", (int)(POLICE_TASKS - available_police_tasks));
+            SendDataMessage(logBuffer);
+
+            snprintf(logBuffer, MAX_MSG_LENGTH, "           Current available tasks: %d\r\n", (int)available_police_tasks);
+            SendDataMessage(logBuffer);
+
+            snprintf(logBuffer, MAX_MSG_LENGTH, "\n********** Fire Dep Tasks Status Report **********\r\n");
+            SendDataMessage(logBuffer);
+
+            snprintf(logBuffer, MAX_MSG_LENGTH, "           Total fire dep tasks: %d\r\n", (int)FIRE_TASKS);
+            SendDataMessage(logBuffer);
+
+            snprintf(logBuffer, MAX_MSG_LENGTH, "           Current occupied tasks: %d\r\n", (int)(FIRE_TASKS - available_fire_tasks));
+            SendDataMessage(logBuffer);
+
+            snprintf(logBuffer, MAX_MSG_LENGTH, "           Current available tasks: %d\r\n", (int)available_fire_tasks);
+            SendDataMessage(logBuffer);
+
+            snprintf(logBuffer, MAX_MSG_LENGTH, "\n*********** Corona Tasks Status Report ************\r\n");
+            SendDataMessage(logBuffer);
+
+            snprintf(logBuffer, MAX_MSG_LENGTH, "           Total corona tasks: %d\r\n", (int)CORONA_TASKS);
+            SendDataMessage(logBuffer);
+
+            snprintf(logBuffer, MAX_MSG_LENGTH, "           Current occupied tasks: %d\r\n", (int)(CORONA_TASKS - available_corona_tasks));
+            SendDataMessage(logBuffer);
+
+            snprintf(logBuffer, MAX_MSG_LENGTH, "           Current available tasks: %d\r\n\n\n", (int)available_corona_tasks);
+            SendDataMessage(logBuffer);
+            xTaskNotify(vBtnDataTask, 0x00, eNoAction);
+            //vTaskSuspend(vBtnDataTask);
+            taskEXIT_CRITICAL();
+            printedStatus = !printedStatus;
+            xTaskNotifyWait(0x00, 0x00, &ulNotificationValue, portMAX_DELAY);
+        }
+    }
 }
-
-

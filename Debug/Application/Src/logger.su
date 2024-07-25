@@ -1,1 +1,4 @@
-../Application/Src/logger.c:10:6:Logger_Print	112	static
+../Application/Src/logger.c:10:6:Logger_Print	120	static
+../Application/Src/logger.c:27:6:SendLogMessage	120	static
+../Application/Src/logger.c:39:6:SendDataMessage	120	static
+../Application/Src/logger.c:51:6:Data_Print	128	static

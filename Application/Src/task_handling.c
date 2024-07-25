@@ -19,7 +19,8 @@ static int8_t getAvailableCoronaTask(void);
 static void removeCurrentRunningTask(uint8_t* avail_dep_tasks);
 static void addCurrentRunningTask(uint8_t* avail_dep_tasks);
 
-
+char logInitBuffer[MAX_MSG_LENGTH];
+char logInitBuffer2[MAX_MSG_LENGTH];
 
 /**
  * @brief Manages and dispatches tasks based on available resources.
@@ -41,8 +42,7 @@ void tasksManagerTask(void) {
 				newTaskIndex = getAvailableAmbulanceTask();
 				if(newTaskIndex != -1) {
 					if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
-						printf("Ambulance handler number %d is now active\r\n", newTaskIndex);
-						fflush(stdout);
+						snprintf(logInitBuffer, MAX_MSG_LENGTH,"Ambulance handler number %d is now active\r\n", newTaskIndex+1);
 						xSemaphoreGive(printfMutex);
 					}
 					addCurrentRunningTask(&available_amb_tasks);
@@ -55,8 +55,7 @@ void tasksManagerTask(void) {
 				newTaskIndex = getAvailablePoliceeTask();
 				if(newTaskIndex != -1) {
 					if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
-						printf("Police handler number %d is now active\r\n", newTaskIndex);
-						fflush(stdout);
+						snprintf(logInitBuffer, MAX_MSG_LENGTH,"Police handler number %d is now active\r\n", newTaskIndex+1);
 						xSemaphoreGive(printfMutex);
 					}
 					addCurrentRunningTask(&available_police_tasks);
@@ -70,8 +69,7 @@ void tasksManagerTask(void) {
 				newTaskIndex = getAvailableFireTask();
 				if(newTaskIndex != -1) {
 					if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
-						printf("Fire dep handler number %d is now active\r\n", newTaskIndex);
-						fflush(stdout);
+						snprintf(logInitBuffer, MAX_MSG_LENGTH,"Fire dep handler number %d is now active\r\n", newTaskIndex+1);
 						xSemaphoreGive(printfMutex);
 					}
 					addCurrentRunningTask(&available_fire_tasks);
@@ -85,8 +83,7 @@ void tasksManagerTask(void) {
 				newTaskIndex = getAvailableCoronaTask();
 				if(newTaskIndex != -1) {
 					if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
-						printf("Corona handler number %d is now active\r\n", newTaskIndex);
-						fflush(stdout);
+						snprintf(logInitBuffer, MAX_MSG_LENGTH,"Corona handler number %d is now active\r\n", newTaskIndex+1);
 						xSemaphoreGive(printfMutex);
 					}
 					addCurrentRunningTask(&available_corona_tasks);
@@ -116,14 +113,14 @@ void vHandleCall(void* pvParameters) {
 	TickType_t startTick, endTick, totalTicks;
 	taskInit_t* pTaskInit = (taskInit_t*)pvParameters;
 	DispatcherPacket new_packet = {0};
-
+	size_t max_message_length = MAX_MSG_LENGTH - 3;
 	char printMSG[100];
 	snprintf(printMSG, 100, "New %s task created! \r\nTask index is %d \r\n"
 			,GET_ENUM_DEPARTMENT_STR(pTaskInit->department)
-			, pTaskInit->taskIdentifier);
+			, (pTaskInit->taskIdentifier+1));
+	SendLogMessage(printMSG);
 	if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
-		printf(printMSG);
-		fflush(stdout);
+		SendLogMessage(printMSG);
 		xSemaphoreGive(printfMutex);
 	}
 	for(;;) {
@@ -138,11 +135,12 @@ void vHandleCall(void* pvParameters) {
 		}
 
 		// Wait for the job to get done.
-		// TODO: Should vTaskDelayUntil be used?
 		vTaskDelay(new_packet.timeToHandleInTicks);
 		if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
-			printf("Handled task: %s \r\n", new_packet.message);
-			fflush(stdout);
+			snprintf(logInitBuffer, MAX_MSG_LENGTH,"Handled task: ");
+			SendLogMessage(logInitBuffer);
+			snprintf(logInitBuffer, MAX_MSG_LENGTH, "%.*s \r\n", (int)max_message_length, new_packet.message);
+			SendLogMessage(logInitBuffer);
 			xSemaphoreGive(printfMutex);
 		}
 
@@ -161,10 +159,6 @@ void vHandleCall(void* pvParameters) {
 				 * 		 is required.
 				 */
 				xSemaphoreGive(xTasksDataMutex);
-			} else {
-				/*
-				 * The mutex couldn't be obtained. Code should never get here.
-				 */
 			}
 		}
 		// Indicate the task is now available for the next incoming packet.

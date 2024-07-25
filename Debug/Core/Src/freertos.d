@@ -55,7 +55,8 @@ Core/Src/freertos.o: ../Core/Src/freertos.c \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h \
  D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/error_handling.h \
  D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/init.h \
- D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/data.h
+ D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/data.h \
+ D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/logger.h
 ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
 ../Core/Inc/FreeRTOSConfig.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h:
@@ -114,3 +115,4 @@ D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/task_h
 D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/error_handling.h:
 D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/init.h:
 D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/data.h:
+D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/logger.h:

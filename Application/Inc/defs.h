@@ -64,7 +64,7 @@
 // Logger Defines
 #define LOGGER_UART			1
 #define LOGGER_QUEUE_SIZE	25
-#define LOGGER_HUART		huart2
+#define LOGGER_HUART		huart3
 
 
 typedef enum  {

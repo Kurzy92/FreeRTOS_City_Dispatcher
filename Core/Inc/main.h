@@ -44,6 +44,7 @@ extern "C" {
 #include "timers.h"
 #include "error_handling.h"
 #include "init.h"
+#include "logger.h"
 
 
 /* USER CODE END Includes */
@@ -61,6 +62,7 @@ extern QueueHandle_t qPolice;
 extern QueueHandle_t qFire;
 extern QueueHandle_t qCorona;
 extern QueueHandle_t qLogger;
+extern QueueHandle_t qBtnData;
 
 extern TaskHandle_t vAmbulanceTasks[AMBULANCE_TASKS];
 extern TaskHandle_t vPoliceTasks[POLICE_TASKS];
@@ -70,10 +72,12 @@ extern TaskHandle_t vGetDataTask;
 extern TaskHandle_t vDispatcherTask;
 extern TaskHandle_t vTasksManagerTask;
 extern TaskHandle_t vGetDataTask;
+extern TaskHandle_t vLoggerTask;
+extern TaskHandle_t vBtnDataTask;
 
 extern RNG_HandleTypeDef hrng;
 extern TIM_HandleTypeDef htim2;
-extern UART_HandleTypeDef huart2;
+extern UART_HandleTypeDef huart3;
 
 
 extern SemaphoreHandle_t xTasksDataMutex;

@@ -1,1 +1,4 @@
-../Application/Src/logger.c:10:6:Logger_Print	2
+../Application/Src/logger.c:10:6:Logger_Print	3
+../Application/Src/logger.c:27:6:SendLogMessage	1
+../Application/Src/logger.c:39:6:SendDataMessage	1
+../Application/Src/logger.c:51:6:Data_Print	4

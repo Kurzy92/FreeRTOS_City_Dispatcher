@@ -55,6 +55,7 @@ Application/Src/init.o: ../Application/Src/init.c \
  D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/task_handling.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h \
  D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/error_handling.h \
+ D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/logger.h \
  D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/data.h
 D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/init.h:
 ../Core/Inc/main.h:
@@ -113,4 +114,5 @@ D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/dispat
 D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/task_handling.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h:
 D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/error_handling.h:
+D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/logger.h:
 D:/Embedded/RTED\ College/City_Dispatch_Sim/city_dispatch/Application/Inc/data.h:

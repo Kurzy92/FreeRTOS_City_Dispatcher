@@ -10,6 +10,9 @@
 /**
  * @brief Initialize and start the various system tasks.
  */
+
+char logBuffer[MAX_MSG_LENGTH];
+
 void initTasks(void) {
 	/* AMBULANCE TASK INIT */
 	if(initAmbTasks() == -1) {
@@ -101,6 +104,10 @@ void initQueues(void) {
 	if(qDispatcher == NULL) {
 		error_handling("Logger queue creation failed!\r\n");
 	}
+	qBtnData = xQueueCreate(LOGGER_QUEUE_SIZE, sizeof(char[MAX_MSG_LENGTH]));
+	if(qDispatcher == NULL) {
+		error_handling("Logger queue creation failed!\r\n");
+	}
 }
 
 
@@ -155,7 +162,7 @@ int8_t initAmbTasks(void) {
 
 		BaseType_t status;
 		char taskName[configMAX_TASK_NAME_LEN];
-		snprintf(taskName, configMAX_TASK_NAME_LEN, "Ambulance_%d", i);
+		snprintf(taskName, configMAX_TASK_NAME_LEN, "Ambulance_%d", i+1);
 	 	status = xTaskCreate((TaskFunction_t)vHandleCall,
 	 							taskName,
 								TASKS_MEMORY_SIZE,
@@ -167,8 +174,8 @@ int8_t initAmbTasks(void) {
 	 	}
 	}
 	if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
-		printf("Started Ambulance Threads! \r\n");
-		fflush(stdout);
+		snprintf(logBuffer, MAX_MSG_LENGTH,"Started Ambulance Threads! \r\n");
+		SendLogMessage(logBuffer);
 		xSemaphoreGive(printfMutex);
 	}
 	return 0;
@@ -194,7 +201,7 @@ int8_t initPolTasks(void) {
 
 		BaseType_t status;
 		char taskName[configMAX_TASK_NAME_LEN];
-		snprintf(taskName, configMAX_TASK_NAME_LEN, "Police_%d", i);
+		snprintf(taskName, configMAX_TASK_NAME_LEN, "Police_%d", i+1);
 	 	status = xTaskCreate((TaskFunction_t)vHandleCall,
 	 							taskName,
 								TASKS_MEMORY_SIZE,
@@ -206,8 +213,8 @@ int8_t initPolTasks(void) {
 	 	}
 	}
 	if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
-		printf("Started Police Threads! \r\n");
-		fflush(stdout);
+		snprintf(logBuffer, MAX_MSG_LENGTH, "Started Police Threads! \r\n");
+		SendLogMessage(logBuffer);
 		xSemaphoreGive(printfMutex);
 	}
 	return 0;
@@ -232,7 +239,7 @@ int8_t initFireTasks(void) {
 		fire_taskInit->numOfTasks = FIRE_TASKS;
 		BaseType_t status;
 		char taskName[configMAX_TASK_NAME_LEN];
-		snprintf(taskName, configMAX_TASK_NAME_LEN, "Fire_%d", i);
+		snprintf(taskName, configMAX_TASK_NAME_LEN, "Fire_%d", i+1);
 	 	status = xTaskCreate((TaskFunction_t)vHandleCall,
 	 							taskName,
 								TASKS_MEMORY_SIZE,
@@ -244,8 +251,8 @@ int8_t initFireTasks(void) {
 	 	}
 	}
 	if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
-		printf("Started Fire Dep Threads! \r\n");
-		fflush(stdout);
+		snprintf(logBuffer, MAX_MSG_LENGTH,"Started Fire Dep Threads! \r\n");
+		SendLogMessage(logBuffer);
 		xSemaphoreGive(printfMutex);
 	}
 	return 0;
@@ -271,7 +278,7 @@ int8_t initCoronaTasks(void) {
 
 		BaseType_t status;
 		char taskName[configMAX_TASK_NAME_LEN];
-		snprintf(taskName, configMAX_TASK_NAME_LEN, "Corona_%d", i);
+		snprintf(taskName, configMAX_TASK_NAME_LEN, "Corona_%d", i+1);
 	 	status = xTaskCreate((TaskFunction_t)vHandleCall,
 	 							taskName,
 								TASKS_MEMORY_SIZE,
@@ -283,8 +290,8 @@ int8_t initCoronaTasks(void) {
 	 	}
 	}
 	if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
-		printf("Started Corona Threads! \r\n");
-		fflush(stdout);
+		snprintf(logBuffer, MAX_MSG_LENGTH,"Started Corona Threads! \r\n");
+		SendLogMessage(logBuffer);
 		xSemaphoreGive(printfMutex);
 	}
 	return 0;
