@@ -137,7 +137,7 @@ void vHandleCall(void* pvParameters) {
 		// Wait for the job to get done.
 		vTaskDelay(new_packet.timeToHandleInTicks);
 		if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
-			snprintf(logInitBuffer, MAX_MSG_LENGTH,"Handled task: ");
+			snprintf(logInitBuffer, MAX_MSG_LENGTH,"%s - Handled task: ", GET_ENUM_DEPARTMENT_STR(pTaskInit->department));
 			SendLogMessage(logInitBuffer);
 			snprintf(logInitBuffer, MAX_MSG_LENGTH, "%.*s \r\n", (int)max_message_length, new_packet.message);
 			SendLogMessage(logInitBuffer);

@@ -19,6 +19,7 @@ void getTasksStatus(void) {
         }
         if (!printedStatus) {
             taskENTER_CRITICAL();
+            while(uxQueueMessagesWaiting(qLogger) != 0);
             vTaskSuspend(vTasksManagerTask);
             vTaskSuspend(vLoggerTask);
 
