@@ -25,6 +25,17 @@ Pressing the button on the STM32F746ZG-NUCLEO board will display various data re
 as well it will suspend the operation of the task management task, and the printing of tasks prints until another button press
 occurs.
 
+Dispatcher calls are being created using a HW timer interrupt, and the RNG periphreal.
+On each TIM2 interrupt, a random department is picked, along with call description picked from a 
+limited pool of calls.
+
+
+**Program's Configuration**
+
+Configuration of the program can be done in the /Application/Inc/defs.h file.
+Various configurations can be modified from there(such as min/max time for a task, number of tasks allocated for each department,
+maximum number of tasks that can be activated in parallel, tasks priorities, queue sizes)
+enums and structs are also included in defs.h.
 
 **Connecting Through UART**
 UART connection is done at a baud rate of 115200 bits/s, and through the board's COM# connection.
