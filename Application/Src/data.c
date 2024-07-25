@@ -18,9 +18,12 @@ void getTasksStatus(void) {
             xTaskNotifyWait(0x00, 0x00, &ulNotificationValue, portMAX_DELAY);
         }
         if (!printedStatus) {
-            taskENTER_CRITICAL();
-            while(uxQueueMessagesWaiting(qLogger) != 0);
+
             vTaskSuspend(vTasksManagerTask);
+            while(uxQueueMessagesWaiting(qLogger) != 0) {
+            	vTaskDelay(15);
+            }
+            taskENTER_CRITICAL();
             vTaskSuspend(vLoggerTask);
 
 

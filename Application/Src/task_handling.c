@@ -115,8 +115,10 @@ void vHandleCall(void* pvParameters) {
 	DispatcherPacket new_packet = {0};
 	size_t max_message_length = MAX_MSG_LENGTH - 3;
 	char printMSG[100];
+	char departmentSTR[12];
+	strncpy(departmentSTR, GET_ENUM_DEPARTMENT_STR(pTaskInit->department), sizeof(departmentSTR)-1);
 	snprintf(printMSG, 100, "New %s task created! \r\nTask index is %d \r\n"
-			,GET_ENUM_DEPARTMENT_STR(pTaskInit->department)
+			,departmentSTR
 			, (pTaskInit->taskIdentifier+1));
 	SendLogMessage(printMSG);
 	if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
@@ -137,7 +139,7 @@ void vHandleCall(void* pvParameters) {
 		// Wait for the job to get done.
 		vTaskDelay(new_packet.timeToHandleInTicks);
 		if(xSemaphoreTake(printfMutex, portMAX_DELAY) == pdTRUE) {
-			snprintf(logInitBuffer, MAX_MSG_LENGTH,"%s - Handled task: ", GET_ENUM_DEPARTMENT_STR(pTaskInit->department));
+			snprintf(logInitBuffer, MAX_MSG_LENGTH,"%s - Handled task: ", departmentSTR);
 			SendLogMessage(logInitBuffer);
 			snprintf(logInitBuffer, MAX_MSG_LENGTH, "%.*s \r\n", (int)max_message_length, new_packet.message);
 			SendLogMessage(logInitBuffer);
