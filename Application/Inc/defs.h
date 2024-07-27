@@ -74,11 +74,11 @@ typedef enum  {
 	CORONA
 } DepartmentsEnum;
 
-typedef struct _Department {
-	DepartmentsEnum name;
-	uint8_t maxResources;
-	uint8_t currentUsedResources;
-} Department_t;
+//typedef struct _Department {
+//	DepartmentsEnum name;
+//	uint8_t maxResources;
+//	uint8_t currentUsedResources;
+//} Department_t;
 
 typedef struct _DispatcherPacket {
 	DepartmentsEnum department;
