@@ -6,7 +6,7 @@ and understand how its various features work and communicate with each other.
 
 **<h3>Project Description</h3>**
 
-The City Dispatcher project simulates the operation control room, responsible
+The City Dispatcher project simulates an operation control room, responsible
 for the management of receiving emergency/urgnet calls and forwarding them to the 
 relevant handler. 
 The project utilizes the use of FreeRTOS's task management features, queues, inter-task communication methods,
